@@ -56,15 +56,22 @@ function shiftnav_get_settings_fields(){
 			*/
 
 			array(
-				'name'	=> 'edge',
-				'label'	=> __( 'Edge' , 'shiftnav' ),
-				'type'	=> 'radio',
-				'options' => array(
-					'left' => 'Left',
-					'right'=> 'Right',
+				'name'		=> 'edge',
+				'label'		=> __( 'Edge' , 'shiftnav' ),
+				'type'		=> 'radio',
+				'options' 	=> array(
+					'left' 	=> 'Left',
+					'right'	=> 'Right',
 				),
-				'default' => 'left'
+				'default' 	=> 'left'
+			),
 
+			array(
+				'name'		=> 'disable_menu',
+				'label'		=> __( 'Disable Menu' , 'shiftnav' ),
+				'desc'		=> __( 'Check this to disable the menu entirely; the panel can be used for custom content' , 'shiftnav' ),
+				'type'		=> 'checkbox',
+				'default'	=> 'off',
 			),
 
 			array(
@@ -74,7 +81,14 @@ function shiftnav_get_settings_fields(){
 				'options' => shiftnav_get_skin_ops(),
 				'default' => 'standard-dark',
 				//'options' => get_registered_nav_menus()
+			),
 
+			array(
+				'name'		=> 'indent_submenus',
+				'label'		=> __( 'Indent Always Visible Submenus' , 'shiftnav' ),
+				'desc'		=> __( 'Check this to indent submenu items of always-visible submenus' , 'shiftnav' ),
+				'type'		=> 'checkbox',
+				'default'	=> 'off',
 			),
 
 			array(
@@ -84,6 +98,8 @@ function shiftnav_get_settings_fields(){
 				'type' => 'checkbox',
 				'default' => 'on'
 			),
+
+
 
 
 			/*
@@ -162,6 +178,14 @@ function shiftnav_get_settings_fields(){
 				'type'	=> 'color',
 				//'default' => '#eeeeee',
 			),
+
+			array(
+				'name' => 'font_size',
+				'label' => __( 'Font Size', 'shiftnav' ),
+				'desc' => __( 'Override the default font size of the toggle bar by setting a value here.', 'shiftnav' ),
+				'type' => 'text',
+				'default' => ''
+			),
 			
 
 			/*
@@ -189,6 +213,20 @@ function shiftnav_get_settings_fields(){
 
 	$fields[$prefix.'general'] = array(
 		
+
+		array(
+			'name' => 'target_size',
+			'label' => __( 'Button Size', 'shiftnav' ),
+			'desc' => __( 'The size of the padding on the links in the menu.  The larger the setting, the easier to click; but fewer menu items will appear on the screen at a time.', 'shiftnav' ),
+			'type' => 'radio',
+			'options' => array(
+				'default' 	=> 'Default',
+				'medium' 	=> 'Medium',
+				'large'		=> 'Large',
+				'enormous' 	=> 'Enormous',
+			),
+			'default' => 'default',
+		),
 		
 		array(
 			'name' 		=> 'admin_tips',
@@ -222,17 +260,9 @@ function shiftnav_get_settings_fields(){
 			'default' => 'off'
 		),
 
+		
+		
 		/*
-		array(
-			'name' => 'radio',
-			'label' => __( 'Radio Button', 'shiftnav' ),
-			'desc' => __( 'A radio button', 'shiftnav' ),
-			'type' => 'radio',
-			'options' => array(
-				'yes' => 'Yes',
-				'no' => 'No'
-			)
-		),
 		array(
 			'name' => 'multicheck',
 			'label' => __( 'Multile checkbox', 'shiftnav' ),

@@ -128,6 +128,9 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 			$icon = '<i class="shiftnav-icon '.$data['icon'].'"></i>';
 		}
 
+		//Disable Link
+		$disable_link = isset( $data['disable_link'] ) && ( $data['disable_link'] == 'on' ) ? true : false;
+
 		
 
 		/**
@@ -184,6 +187,7 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 
 		//Merge ShiftNav atts
 		$atts = array_merge( $atts , $shiftnav_atts );
+		if( $disable_link ) unset( $atts['href'] );			//remove href for disabled links
 
 		$attributes = '';
 		foreach ( $atts as $attr => $value ) {
@@ -193,14 +197,17 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 			}
 		}
 
+		$el = 'a';
+		if( $disable_link ) $el = 'span';
+
 		$item_output = $args->before;
-		$item_output .= '<a class="shiftnav-target" '. $attributes .'>';
+		$item_output .= '<'.$el.' class="shiftnav-target" '. $attributes .'>';
 		/** This filter is documented in wp-includes/post-template.php */
 		$title = apply_filters( 'the_title', $item->title, $item->ID );
 		if( $icon ) $title = '<span class="shiftnav-target-text">'.$title.'</span>';
 		$item_output .= $args->link_before . $icon . $title . $args->link_after;
 
-		$item_output .= '</a>';
+		$item_output .= '</'.$el.'>';
 
 		if( $has_sub ){
 			switch( $submenu_type ){

@@ -12,6 +12,7 @@
 	z-index:6000;
 	overflow-y:auto;
 	overflow-x:hidden;
+	-webkit-overflow-scrolling:touch;
 
 	-webkit-transition: -webkit-transform 0.5s;
 	-moz-transition: -moz-transform 0.5s;
@@ -111,7 +112,7 @@
 .shiftnav ul.shiftnav-menu li.shiftnav-retract > .shiftnav-target{
 	display:block;
 	padding:16px 25px;
-	padding:4px 25px;
+	padding:6px 25px;
 	line-height:300%;
 	text-decoration: none;
 	position:relative;
@@ -138,11 +139,10 @@
 .shiftnav ul.shiftnav-menu li.shiftnav-sub-shift li.shiftnav-retract{
 	display:block;
 }
-/*
-.shiftnav ul.shiftnav-menu ul.sub-menu li.menu-item > a{							padding-left:50px;	}
-.shiftnav ul.shiftnav-menu ul.sub-menu ul.sub-menu li.menu-item > a{				padding-left:75px;	}
-.shiftnav ul.shiftnav-menu ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > a{	padding-left:100px;	}
-*/
+
+
+/* Menu Items */
+
 .shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item{
 	/*margin-left:100%;*/
 	left:100%;
@@ -152,3 +152,20 @@
 	left:0;
 }
 
+/* Medium */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-medium li.menu-item > .shiftnav-target{
+	padding-top:10px !important;
+	padding-bottom:10px !important;
+}
+
+/* Large */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-large li.menu-item > .shiftnav-target{
+	padding-top:16px !important;
+	padding-bottom:16px !important;
+}
+
+/* Enormous */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-enormous li.menu-item > .shiftnav-target{
+	padding-top:24px !important;
+	padding-bottom:24px !important;
+}

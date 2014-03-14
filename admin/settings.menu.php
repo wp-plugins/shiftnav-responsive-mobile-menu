@@ -38,7 +38,7 @@ function shiftnav_menu_item_settings_panel(){
 
 		<div class="shiftnav-menu-item-settings-topper">
 			<i class="fa fa-cogs"></i> SHIFTNAV SETTINGS 
-			<?php if( !SHIFTNAV_PRO ): ?><a target="_blank" href="http://goo.gl/FStNFn" class="shiftnav-up-link"><i class="fa fa-rocket"></i> Go Pro</a><?php endif; ?>
+			<?php if( !SHIFTNAV_PRO ): ?><a target="_blank" href="http://goo.gl/7jzDSQ" class="shiftnav-up-link"><i class="fa fa-rocket"></i> Go Pro</a><?php endif; ?>
 		</div>
 
 		<div class="shiftnav-menu-item-panel shiftnav-menu-item-panel-negative">
@@ -164,7 +164,7 @@ add_action( 'admin_footer-nav-menus.php' , 'shiftnav_menu_item_settings_panel');
 function shiftnav_show_menu_item_setting( $setting ){
 
 	if( isset( $setting['pro_only'] ) && $setting['pro_only'] ){
-		echo 'Upgrade to ShiftNav Pro to use this feature.';
+		echo '<a class="shiftnav-upgrade-link" target="_blank" href="http://goo.gl/9UuoWS">Upgrade to ShiftNav Pro</a> to use this feature.';
 		return;
 	}
 

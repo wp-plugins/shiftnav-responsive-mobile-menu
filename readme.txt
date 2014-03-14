@@ -4,7 +4,7 @@ Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
 Requires at least: 3.8.1
 Tested up to: 3.8.1
-Stable tag: 0.1
+Stable tag: 0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,16 @@ None. Yet.
 
 
 == Changelog ==
+
+= 0.2 =
+
+* Added Menu Bar Font Size Setting
+* Automatically enlarge toggle font size below 960px
+* Added Indent Always Visible Submenus option (per menu)
+* Added Smooth Scrolling on iOS
+* Added ability to disable menu
+* Added menu item size adjustments (global)
+* Added Disable Link ability
 
 = 0.1 =
 
