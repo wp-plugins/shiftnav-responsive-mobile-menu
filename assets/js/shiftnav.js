@@ -119,7 +119,9 @@
 
 			//Set retractor heights
 			this.$shiftnav.find( '.shiftnav-submenu-activation' ).each( function(){
-				$( this ).css( 'height' , $( this ).outerHeight() );
+				var length = $( this ).outerHeight();
+				$( this ).css( { 'height' : length , 'width' : length } );
+				
 				//$( this ).css( 'height' , $( this ).parent( '.menu-item' ).height() );
 			});
 			

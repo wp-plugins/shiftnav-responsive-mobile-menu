@@ -27,35 +27,49 @@ function shiftnav( $id , $settings = array() ){
 
 		do_action( 'shiftnav_before' , $id );
 
-		$args = array(
-			'container_class' 	=> 'shiftnav-nav', //$container_class,	//shiftnav-transition-standard 
-			//'container_id'		=> $id,
-			'container'			=> $container,
-			'menu_class' 		=> 'shiftnav-menu',
-			'walker'			=> new ShiftNavWalker,
-			'fallback_cb'		=> 'shiftnav_fallback'
-		);
+		$disable_menu = shiftnav_op( 'disable_menu' , $id ) == 'on' ? true : false;
 
-		if( $menu != '_none' ){
-			$args['menu'] = $menu;
-		}
-		else if( $theme_location != '_none' ){
-			$args['theme_location'] = $theme_location;
-			if( !has_nav_menu( $theme_location ) ){
+		if( !$disable_menu ){
 
-				shiftnav_count_menus();
+			$args = array(
+				'container_class' 	=> 'shiftnav-nav', //$container_class,	//shiftnav-transition-standard 
+				//'container_id'		=> $id,
+				'container'			=> $container,
+				'menu_class' 		=> 'shiftnav-menu',
+				'walker'			=> new ShiftNavWalker,
+				'fallback_cb'		=> 'shiftnav_fallback'
+			);
 
-				$locs = get_registered_nav_menus();
-				$loc = $locs[$theme_location];
-				shiftnav_show_tip( 'Please <a href="'.admin_url('nav-menus.php?action=locations').'">assign a menu</a> to the <strong>'.$loc.'</strong> theme location' );
+
+			//Target size
+			$args['menu_class'].= ' shiftnav-targets-'.shiftnav_op( 'target_size' , 'general' );
+
+			//Submenu indent
+			if( shiftnav_op( 'indent_submenus' , $id ) == 'on' ) $args['menu_class'].= ' shiftnav-indent-subs';
+
+
+			if( $menu != '_none' ){
+				$args['menu'] = $menu;
 			}
-		}
-		else{
-			shiftnav_count_menus();
-			shiftnav_show_tip( 'Please <a href="'.admin_url( 'themes.php?page=shiftnav-settings#shiftnav_'.$id ).'">set a Theme Location or Menu</a> for this instance' );
-		}
+			else if( $theme_location != '_none' ){
+				$args['theme_location'] = $theme_location;
+				if( !has_nav_menu( $theme_location ) ){
 
-		wp_nav_menu( $args );
+					shiftnav_count_menus();
+
+					$locs = get_registered_nav_menus();
+					$loc = $locs[$theme_location];
+					shiftnav_show_tip( 'Please <a href="'.admin_url('nav-menus.php?action=locations').'">assign a menu</a> to the <strong>'.$loc.'</strong> theme location' );
+				}
+			}
+			else{
+				shiftnav_count_menus();
+				shiftnav_show_tip( 'Please <a href="'.admin_url( 'themes.php?page=shiftnav-settings#shiftnav_'.$id ).'">set a Theme Location or Menu</a> for this instance' );
+			}
+
+			wp_nav_menu( $args );
+
+		}
 
 		do_action( 'shiftnav_after' , $id );
 

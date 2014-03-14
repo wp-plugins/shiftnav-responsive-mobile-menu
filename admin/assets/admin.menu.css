@@ -75,6 +75,7 @@
 	text-decoration: none;
 	padding:2px 6px;
 	display:inline-block;
+	margin-left:5px;
 }
 .shiftnav-up-link:hover{
 	color:#fff;
@@ -509,4 +510,12 @@
 .shiftnav-js-check:hover .shiftnav-js-check-details{
 	height:140px;
 	visibility:visible;
+}
+
+
+.shiftnav-upgrade-link{
+	color:#666;
+}
+.shiftnav-upgrade-link:hover{
+	color:#35AC6A;
 }

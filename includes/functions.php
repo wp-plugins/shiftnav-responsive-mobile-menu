@@ -29,10 +29,17 @@ function shiftnav_inject_css(){
 		if( $hide_theme_menu != '' ){
 			$toggle_breakpoint = ( (int) $toggle_breakpoint ) - 1;
 			$css.= "\t@media only screen and (max-width:{$toggle_breakpoint}px){ ";
-			$css.= "$hide_theme_menu{ display:none !important; }";
+			$css.= "$hide_theme_menu{ display:none !important; } ";
 			$css.= "}\n";
 		}
 	}
+
+	$font_size = shiftnav_op( 'font_size' , 'togglebar' );
+	if( $font_size != '' ){
+		if( is_numeric( $font_size ) ) $font_size.= 'px';
+		$css.= "\t#shiftnav-toggle-main{ font-size: $font_size !important; }";
+	}
+	
 
 
 	/**
