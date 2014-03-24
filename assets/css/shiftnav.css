@@ -12,12 +12,14 @@
   line-height: 1.3em;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-body.shiftnav-lock.shiftnav-enabled {
+body.shiftnav-lock-x.shiftnav-enabled {
   overflow-x: hidden;
+}
+body.shiftnav-lock.shiftnav-open {
+  overflow: hidden;
 }
 body.shiftnav-open {
   /*overflow:hidden;*/
-
 }
 body.shiftnav-transition {
   overflow: visible;
@@ -25,7 +27,6 @@ body.shiftnav-transition {
 body.shiftnav-enabled.shiftnav-open.admin-bar,
 body.shiftnav-enabled.shiftnav-transition.admin-bar {
   /*margin-top:-28px;*/
-
 }
 /* TOGGLE */
 .shiftnav-toggle {
@@ -55,7 +56,6 @@ body.shiftnav-enabled.shiftnav-transition.admin-bar {
 }
 #shiftnav-toggle-main {
   /* dark skin */
-
   background: #1D1D20;
   color: #eee;
 }
@@ -67,10 +67,18 @@ body.shiftnav-enabled.shiftnav-transition.admin-bar {
 #shiftnav-toggle-main:before {
   position: absolute;
   left: 20px;
-  content: '\2261';
-  margin-right: 10px;
-  content: "\f0c9";
+  /*content: '\2261';*/
+  content: '\f0c9';
   font-family: FontAwesome;
+}
+.shiftnav-open-right #shiftnav-toggle-main:before,
+#shiftnav-toggle-main.shiftnav-toggle-edge-right:before {
+  left: auto;
+  right: 20px;
+}
+.shiftnav-open-left #shiftnav-toggle-main.shiftnav-toggle-edge-right:before {
+  left: 20px;
+  right: auto;
 }
 .shiftnav-force #shiftnav-toggle-main {
   display: block !important;
@@ -129,12 +137,11 @@ body.admin-bar .shiftnav {
 }
 .shiftnav-open .shiftnav-wrap {
   height: 100%;
-  -webkit-overflow-scrolling: touch;
-  -webkit-transition-delay: .02s;
-  -moz-transition-delay: .02s;
-  -ms-transition-delay: .02s;
-  -o-transition-delay: .02s;
-  transition-delay: .02s;
+  -webkit-transition-delay: .01s;
+  -moz-transition-delay: .01s;
+  -ms-transition-delay: .01s;
+  -o-transition-delay: .01s;
+  transition-delay: .01s;
 }
 /* Shadow */
 .shiftnav:after {
@@ -170,12 +177,16 @@ body.admin-bar .shiftnav {
   z-index: 6000;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   -webkit-transition: -webkit-transform 0.5s;
   -moz-transition: -moz-transform 0.5s;
   -ms-transition: -ms-transform 0.5s;
   -o-transition: -o-transform 0.5s;
   transition: transform 0.5s;
+}
+.shiftnav-inner {
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  overflow-y: scroll;
 }
 .shiftnav.shiftnav-left-edge {
   left: 0;
@@ -233,8 +244,8 @@ body.admin-bar .shiftnav {
   text-decoration: none;
 }
 /* Menu Image */
-.shiftnav .shiftnav-menu-image {
-  padding: 50px 25px;
+.shiftnav .shiftnav-menu-image-padded {
+  padding: 25px;
 }
 .shiftnav .shiftnav-menu-image img {
   max-width: 100%;
@@ -243,6 +254,7 @@ body.admin-bar .shiftnav {
 /* Menu */
 .shiftnav ul.shiftnav-menu {
   position: relative;
+  clear: both;
 }
 .shiftnav ul.shiftnav-menu,
 .shiftnav ul.shiftnav-menu ul.sub-menu {
@@ -264,6 +276,11 @@ body.admin-bar .shiftnav {
   text-decoration: none;
   position: relative;
   cursor: pointer;
+  -webkit-transition: .2s all ease;
+  -moz-transition: .2s all ease;
+  -ms-transition: .2s all ease;
+  -o-transition: .2s all ease;
+  transition: .2s all ease;
 }
 .shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon {
   margin-right: .8em;
@@ -272,6 +289,9 @@ body.admin-bar .shiftnav {
   line-height: inherit;
   width: 1.2em;
   text-align: center;
+}
+.shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before {
+  vertical-align: top;
 }
 .shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > span.shiftnav-target-text {
   vertical-align: middle;
@@ -288,28 +308,64 @@ body.admin-bar .shiftnav {
 /* Menu Items */
 .shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item {
   /*margin-left:100%;*/
-
   left: 100%;
 }
 .shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item.shiftnav-active {
   /*margin-left:0;*/
-
   left: 0;
 }
-/* Medium */
+/* Buttons Medium */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-medium li.menu-item > .shiftnav-target {
   padding-top: 10px !important;
   padding-bottom: 10px !important;
 }
-/* Large */
+/* Buttons Large */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-large li.menu-item > .shiftnav-target {
   padding-top: 16px !important;
   padding-bottom: 16px !important;
 }
-/* Enormous */
+/* Buttons Enormous */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-enormous li.menu-item > .shiftnav-target {
   padding-top: 24px !important;
   padding-bottom: 24px !important;
+}
+/* Text Small */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-small li.menu-item > .shiftnav-target {
+  font-size: 12px !important;
+}
+/* Text Medium */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-medium li.menu-item > .shiftnav-target {
+  font-size: 14px !important;
+}
+/* Text Large */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-large li.menu-item > .shiftnav-target {
+  font-size: 16px !important;
+}
+/* Text Enormous */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-enormous li.menu-item > .shiftnav-target {
+  font-size: 22px !important;
+}
+/* Icons Small */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-small li.menu-item > .shiftnav-target > i.shiftnav-icon {
+  font-size: 100% !important;
+}
+/* Icons Medium */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-medium li.menu-item > .shiftnav-target > i.shiftnav-icon {
+  font-size: 140% !important;
+}
+/* Icons Large */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-large li.menu-item > .shiftnav-target > i.shiftnav-icon {
+  font-size: 180% !important;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-large li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before {
+  vertical-align: middle;
+}
+/* Icons Enormous */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item > .shiftnav-target > i.shiftnav-icon {
+  font-size: 250% !important;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before {
+  vertical-align: middle;
 }
 /* RESPONSIVENESS */
 @media only screen and (max-width: 960px) {
@@ -344,6 +400,12 @@ body.admin-bar .shiftnav {
     font-weight: normal;
     margin: 0;
   }
+}
+.shiftnav-content-wrap {
+  padding: 25px;
+}
+.shiftnav-content-wrap-small {
+  padding: 10px;
 }
 .shiftnav-admin-tip {
   background: #eee;

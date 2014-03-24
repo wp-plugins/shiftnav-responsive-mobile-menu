@@ -23,6 +23,7 @@ function shiftnav_inject_css(){
 	if( $toggle_breakpoint != '' ){
 		$css.= "\t@media only screen and (min-width:{$toggle_breakpoint}px){ ";
 		$css.= "#shiftnav-toggle-main{ display:none; } .shiftnav-wrap { padding-top:0 !important; } ";
+		if( shiftnav_op( 'shift_body' , 'general' ) == 'off' ) $css.= "body.shiftnav-disable-shift-body{ padding-top:0 !important; } ";
 		$css.= "}\n";
 
 		$hide_theme_menu = shiftnav_op( 'hide_theme_menu', 'togglebar' );
@@ -38,6 +39,11 @@ function shiftnav_inject_css(){
 	if( $font_size != '' ){
 		if( is_numeric( $font_size ) ) $font_size.= 'px';
 		$css.= "\t#shiftnav-toggle-main{ font-size: $font_size !important; }";
+	}
+
+	$tweaks = shiftnav_op( 'css_tweaks' , 'general' );
+	if( $tweaks != '' ){
+		$css.= "\n\n\t/* Custom CSS Tweaks */\n\t".$tweaks;
 	}
 	
 
@@ -65,11 +71,20 @@ add_action( 'wp_head' , 'shiftnav_inject_css' );
 function shiftnav_direct_injection(){
 
 	if( shiftnav_op( 'display_toggle' , 'togglebar' ) == 'on' ){
+
+		?>
+	<!-- ShiftNav Main Toggle -->
+		<?php
+
 		shiftnav_toggle( 'shiftnav-main' , shiftnav_main_toggle_content() , array(
 			'id' => 'shiftnav-toggle-main' , 
 			'el' => 'div',
 			'class' => 'shiftnav-toggle-main-align-'.shiftnav_op( 'align' , 'togglebar' ),
 		));
+
+		?>
+
+	<!-- /#shiftnav-toggle-main --> <?php
 	}
 
 	if( shiftnav_op( 'display_main' , 'shiftnav-main' ) == 'on' ){
@@ -116,8 +131,11 @@ function _shiftnav_toggle( $target_id , $content = '', $args = array() ){
 		'class'	=> 	'',
 	) ) );
 
-	?>
-	<?php echo "<$el ";
+	$content = do_shortcode( $content );
+
+	if( $id && $id == 'shiftnav-toggle-main' ) $class = 'shiftnav-toggle-edge-'.shiftnav_op( 'edge' , 'shiftnav-main' ) . ' ' . $class;
+
+	echo "<$el ";
 		if( $id ): ?>id="<?php echo $id; ?>"<?php endif; 
 		?> class="shiftnav-toggle shiftnav-toggle-<?php echo $target_id; ?> <?php echo $class; ?>" data-shiftnav-target="<?php echo $target_id; ?>"><?php echo $content; 
 	echo "</$el>"; ?>
@@ -168,14 +186,20 @@ function shiftnav_load_assets(){
 
 	//Load Required Skins
 	$skin = shiftnav_op( 'skin' , 'shiftnav-main' );
-	shiftnav_enqueue_skin( $skin );
+	if( $skin != 'none' ) shiftnav_enqueue_skin( $skin );
+
+	//Load custom.css
+	//$load_custom_css = shiftnav_op( 'load_custom_css' , 'general' );
+	//if( $load_custom_css == 'on' ) wp_enqueue_style( 'shiftnav-custom' , SHIFTNAV_URL . 'custom/custom.css' );
 	
 
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'shiftnav' , $assets.'js/shiftnav.js' , array( 'jquery' ) , SHIFTNAV_VERSION , true );
 
 	wp_localize_script( 'shiftnav' , 'shiftnav_data' , array( 
-		'lock_body'	=>	shiftnav_op( 'lock_body' , 'general' ),
+		'shift_body'	=>	shiftnav_op( 'shift_body' , 'general' ),
+		'lock_body'		=>	shiftnav_op( 'lock_body' , 'general' ),
+		'lock_body_x'	=>	shiftnav_op( 'lock_body_x' , 'general' ),
 	) );
 }
 add_action( 'wp_enqueue_scripts' , 'shiftnav_load_assets' , 21 );
@@ -202,6 +226,11 @@ function shiftnav_register_skins(){
 	shiftnav_register_skin( 'standard-dark' , 'Standard Dark' , $main.'standard-dark.css' );
 	//shiftnav_register_skin( 'slate' , 'Slate' , $main.'slate.css' );
 	shiftnav_register_skin( 'light' , 'Standard Light' , $main.'light.css' );
+}
+add_action( 'init' , 'shiftnav_pro_register_skin_none' , 20 );
+function shiftnav_pro_register_skin_none(){
+	shiftnav_register_skin( 'custom' , 'Custom (custom.css)' , SHIFTNAV_URL.'custom/custom.css' );
+	shiftnav_register_skin( 'none' , 'None (Disable)' , '' );
 }
 function shiftnav_enqueue_skin( $skin ){
 	wp_enqueue_style( 'shiftnav-'.$skin );

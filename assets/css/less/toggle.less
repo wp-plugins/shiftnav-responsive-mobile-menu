@@ -41,11 +41,18 @@
 #shiftnav-toggle-main:before{
 	position:absolute;
 	left:20px;
-	content: '\2261';
-	margin-right: 10px;
-
-	content: "\f0c9";
+	/*content: '\2261';*/
+	content: '\f0c9';
 	font-family: FontAwesome;
+}
+.shiftnav-open-right #shiftnav-toggle-main:before,
+#shiftnav-toggle-main.shiftnav-toggle-edge-right:before{
+	left:auto;
+	right:20px;
+}
+.shiftnav-open-left #shiftnav-toggle-main.shiftnav-toggle-edge-right:before{
+	left:20px;
+	right:auto;
 }
 
 .shiftnav-force #shiftnav-toggle-main{

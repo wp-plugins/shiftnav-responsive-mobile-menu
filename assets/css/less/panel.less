@@ -11,14 +11,18 @@
 	background:white;
 	z-index:6000;
 	overflow-y:auto;
-	overflow-x:hidden;
-	-webkit-overflow-scrolling:touch;
+	overflow-x:hidden;	
 
 	-webkit-transition: -webkit-transform 0.5s;
 	-moz-transition: -moz-transform 0.5s;
 	-ms-transition: -ms-transform 0.5s;
 	-o-transition: -o-transform 0.5s;
 	transition: transform 0.5s;
+}
+.shiftnav-inner{
+	-webkit-overflow-scrolling:touch;
+	height:100%;
+	overflow-y:scroll;
 }
 
 .shiftnav.shiftnav-left-edge{
@@ -84,8 +88,8 @@
 
 
 /* Menu Image */
-.shiftnav .shiftnav-menu-image{
-	padding:50px 25px;
+.shiftnav .shiftnav-menu-image-padded{
+	padding:25px;
 }
 .shiftnav .shiftnav-menu-image img{
 	max-width:100%;
@@ -96,6 +100,7 @@
 /* Menu */
 .shiftnav ul.shiftnav-menu{
 	position:relative;
+	clear:both;
 }
 .shiftnav ul.shiftnav-menu,
 .shiftnav ul.shiftnav-menu ul.sub-menu{
@@ -117,6 +122,12 @@
 	text-decoration: none;
 	position:relative;
 	cursor:pointer;
+
+	-webkit-transition:.2s all ease;
+	-moz-transition:.2s all ease;
+	-ms-transition:.2s all ease;
+	-o-transition:.2s all ease;
+	transition:.2s all ease;
 }
 .shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon{
 	margin-right:.8em;
@@ -125,6 +136,9 @@
 	line-height:inherit;
 	width:1.2em;
 	text-align:center;
+}
+.shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before{
+	vertical-align:top;
 }
 .shiftnav ul.shiftnav-menu li.menu-item.shiftnav-has-icon > .shiftnav-target > span.shiftnav-target-text{
 	vertical-align:middle;
@@ -152,20 +166,61 @@
 	left:0;
 }
 
-/* Medium */
+/* Buttons Medium */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-medium li.menu-item > .shiftnav-target{
 	padding-top:10px !important;
 	padding-bottom:10px !important;
 }
 
-/* Large */
+/* Buttons Large */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-large li.menu-item > .shiftnav-target{
 	padding-top:16px !important;
 	padding-bottom:16px !important;
 }
 
-/* Enormous */
+/* Buttons Enormous */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-enormous li.menu-item > .shiftnav-target{
 	padding-top:24px !important;
 	padding-bottom:24px !important;
+}
+
+/* Text Small */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-small li.menu-item > .shiftnav-target{
+	font-size:12px !important;
+}
+/* Text Medium */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-medium li.menu-item > .shiftnav-target{
+	font-size:14px !important;
+}
+/* Text Large */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-large li.menu-item > .shiftnav-target{
+	font-size:16px !important;
+}
+/* Text Enormous */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-text-enormous li.menu-item > .shiftnav-target{
+	font-size:22px !important;
+}
+
+
+/* Icons Small */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-small li.menu-item > .shiftnav-target > i.shiftnav-icon{
+	font-size:100% !important;
+}
+/* Icons Medium */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-medium li.menu-item > .shiftnav-target > i.shiftnav-icon{
+	font-size:140% !important;
+}
+/* Icons Large */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-large li.menu-item > .shiftnav-target > i.shiftnav-icon{
+	font-size:180% !important;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-large li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before{
+	vertical-align:middle;
+}
+/* Icons Enormous */
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item > .shiftnav-target > i.shiftnav-icon{
+	font-size:250% !important;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before{
+	vertical-align:middle;
 }

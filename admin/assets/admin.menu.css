@@ -2,7 +2,9 @@
 	padding-bottom:40px;
 }
 
-
+body.shiftnav-settings-panel-is-open #wpwrap{
+	padding-bottom:500px;
+}
 
 .shiftnav-settings-toggle{
 	font-size:10px;
@@ -22,6 +24,40 @@
 .menu-item:hover .shiftnav-settings-toggle{
 	opacity:1;
 	visibility:visible;
+}
+
+.shiftnav-unsaved .shiftnav-settings-toggle{
+	opacity:1;
+	visibility:visible;
+}
+.shiftnav-unsaved-alert{
+	display:none;
+	margin-left:4px;
+	color: #FAC92C;
+}
+.shiftnav-unsaved .shiftnav-unsaved-alert{
+	display:inline;
+}
+.shiftnav-unsaved-alert-message{
+	max-width:0;
+	overflow:hidden;
+	visibility:hidden;
+	opacity:0;
+	-webkit-transition:all .2s ease-in;
+	transition:all .2s ease-in;
+	position:absolute;
+	background:#FAC92C;
+	color:#f9f9f9;
+	text-shadow:0px 0px 1px rgba(0,0,0,.3);
+	left:100%;
+	padding:3px 5px;
+	display:inline-block;
+	top:0;
+}
+.shiftnav-unsaved:hover .shiftnav-unsaved-alert-message{
+	max-width:100px;
+	visibility:visible;
+	opacity:1;
 }
 
 /* Wrapper */
