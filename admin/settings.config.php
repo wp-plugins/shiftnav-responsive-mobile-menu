@@ -1,5 +1,10 @@
 <?php
 
+function shiftnav_settings_links(){
+	echo '<a target="_blank" class="button button-primary" href="http://sevenspark.com/docs/shiftnav"><i class="fa fa-book"></i> Knowledgebase</a> ';
+}
+add_action( 'shiftnav_settings_before_title' , 'shiftnav_settings_links' );
+
 function shiftnav_get_settings_fields(){
 
 	$prefix = SHIFTNAV_PREFIX;
@@ -64,14 +69,6 @@ function shiftnav_get_settings_fields(){
 					'right'	=> 'Right',
 				),
 				'default' 	=> 'left'
-			),
-
-			array(
-				'name'		=> 'disable_menu',
-				'label'		=> __( 'Disable Menu' , 'shiftnav' ),
-				'desc'		=> __( 'Check this to disable the menu entirely; the panel can be used for custom content' , 'shiftnav' ),
-				'type'		=> 'checkbox',
-				'default'	=> 'off',
 			),
 
 			array(
@@ -149,6 +146,7 @@ function shiftnav_get_settings_fields(){
 				'desc'	=> __( '[shift_toggle_title]' , 'shiftnav' ),
 				'type'	=> 'textarea',
 				'default' => '[shift_toggle_title]', //get_bloginfo( 'title' )
+				'sanitize_callback' => 'shiftnav_allow_html',
 			),
 			array(
 				'name'	=> 'align',
@@ -213,6 +211,13 @@ function shiftnav_get_settings_fields(){
 
 	$fields[$prefix.'general'] = array(
 		
+		array( 
+			'name'	=> 'css_tweaks',
+			'label'	=> __( 'CSS Tweaks' , 'shiftnav' ),
+			'desc'	=> __( 'Add custom CSS here, which will be printed in the site head.' , 'shiftnav' ),
+			'type'	=> 'textarea',
+			'sanitize_callback' => 'shiftnav_allow_html',
+		),
 
 		array(
 			'name' => 'target_size',
@@ -227,6 +232,52 @@ function shiftnav_get_settings_fields(){
 			),
 			'default' => 'default',
 		),
+
+		array(
+			'name' => 'text_size',
+			'label' => __( 'Text Size', 'shiftnav' ),
+			'desc' => __( 'The size of the font on the links in the menu (will override all levels).', 'shiftnav' ),
+			'type' => 'radio',
+			'options' => array(
+				'default' 	=> 'Default',
+				'small'		=> 'Small',
+				'medium' 	=> 'Medium',
+				'large'		=> 'Large',
+				'enormous' 	=> 'Enormous',
+			),
+			'default' => 'default',
+		),
+
+		array(
+			'name' => 'icon_size',
+			'label' => __( 'Icon Size', 'shiftnav' ),
+			'desc' => __( 'The size of the icons in the menu.', 'shiftnav' ),
+			'type' => 'radio',
+			'options' => array(
+				'default' 	=> 'Default',
+				'small'		=> 'Small',
+				'medium' 	=> 'Medium',
+				'large'		=> 'Large',
+				'enormous' 	=> 'Enormous',
+			),
+			'default' => 'default',
+		),
+
+		array(
+			'name' 		=> 'shift_body',
+			'label' 	=> __( 'Shift Body', 'shiftnav' ),
+			'desc' 		=> __( 'Shift the body of the site when the menu is revealed.  For some themes, this may negatively affect the site content, so this can be disabled.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'on'
+		),
+
+		array(
+			'name' 		=> 'active_on_hover',
+			'label' 	=> __( 'Highlight Targets on Hover', 'shiftnav' ),
+			'desc' 		=> __( 'With this setting enabled, the links will be highlighted when hovered or touched.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'on'
+		),
 		
 		array(
 			'name' 		=> 'admin_tips',
@@ -237,9 +288,17 @@ function shiftnav_get_settings_fields(){
 		),
 
 		array(
+			'name' 		=> 'lock_body_x',
+			'label' 	=> __( 'Lock Horizontal Scroll', 'shiftnav' ),
+			'desc' 		=> __( 'Attempt to prevent the content from scrolling horizontally when the menu is active.  On some themes, may also prevent vertical scrolling.  May not prevent touch scrolling in Chrome.  No effect if <strong>Shift Body</strong> is disabled.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
+		),
+
+		array(
 			'name' 		=> 'lock_body',
 			'label' 	=> __( 'Lock Scroll', 'shiftnav' ),
-			'desc' 		=> __( 'Prevent the content from scrolling horizontally when the menu is active.  On some themes, may also prevent vertical scrolling.', 'shiftnav' ),
+			'desc' 		=> __( 'Lock both vertical and horizontal scrolling on site content when menu is active.  No effect if <strong>Shift Body</strong> is disabled.', 'shiftnav' ),
 			'type' 		=> 'checkbox',
 			'default' 	=> 'on'
 		),
@@ -401,10 +460,19 @@ function shiftnav_settings_panel() {
 	
 	$settings_api = _SHIFTNAV()->settings_api();
  
-	echo '<div class="wrap">';
-	settings_errors();
+	?>
 
-	echo '<h2>ShiftNav</h2>';
+	<div class="wrap">
+	
+	<?php settings_errors(); ?>
+
+	<div class="shiftnav-settings-links">
+		<?php do_action( 'shiftnav_settings_before_title' ); ?>
+	</div>
+
+	<h2>ShiftNav <?php if( SHIFTNAV_PRO ) echo 'Pro <i class="fa fa-rocket"></i>'; ?></h2>
+
+	<?php
 
 	do_action( 'shiftnav_settings_before' );	
  
@@ -413,7 +481,11 @@ function shiftnav_settings_panel() {
 
 	do_action( 'shiftnav_settings_after' );
  
-	echo '</div>';
+	?>
+
+	</div>
+
+	<?php
 }
 
 
@@ -453,168 +525,18 @@ function shiftnav_get_instance_options( $instance ){
 function shiftnav_admin_panel_styles(){
 	?>
 <style>
-.form-table th{
-	padding-left:15px;	
-}
-h2.nav-tab-wrapper{
-	padding-left:0;
-}
 
-
-.shiftnav_instance_manager{
-
-}
-a.shiftnav_instance_toggle{
-
-	float:right;
-}
-.shiftnav_instance_container_wrap,
-.shiftnav_instance_notice_wrap{
-	position:fixed;
-	z-index:999;
-	background:#444;
-	background:rgba(0,0,0,.7);
-
-	left:0;
-	top:0;
-	width:100%;
-	height:100%;
-
-	display:none;
-}
-.shiftnav_instance_container,
-.shiftnav_instance_notice{
-	display:table;
-	height:auto;
-
-	background:#e9e9e9;
-	padding:20px;
-
-	width: 50%;
-	overflow: auto;
-	margin: auto;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-}
-
-.shiftnav_instance_container h3{
-	margin-top:0;
-}
-
-form.shiftnav_instance_form{
-	float:left;
-	width:100%;
-	margin:0 0 20px 0;
-
-}
-
-input.shiftnav_instance_input{
-	padding:10px;
-	height:40px;
-	box-sizing:border-box;
-	display:block;
-	float:left;
-	width:80%;
-	margin:0;
-
-	border:none;
-}
-a.shiftnav_instance_button{
-	display:inline-block;
-	padding:10px;
-	height:40px;
-	
-	box-sizing:border-box;
-	margin:0;
-	background:#12B365;
-	text-align:center;
-	color:#fff;
-	font-weight:bold;
-	cursor:pointer;
-	text-decoration: none;
-}
-.shiftnav_instance_container a.shiftnav_instance_button{
-	float:left;
-	width:20%;
-}
-.shiftnav_instance_form_desc{
-	display:block;
-	clear:both;
-	margin:20px 0;
-}
-a.shiftnav_instance_button_delete{
-	background:#B31212;	
-}
-
-code.shiftnav-highlight-code{
-	border-left:2px solid #12B365;
-	background:#eee; /*#C4E9D7;*/
-	padding:10px;
-	display:block;
-	float:left;
-	font-size:11px;
-	max-width:500px;
-}
-.form-table p.shiftnav-sub-desc{
-	clear:both;
-	display:block;
-	padding:10px 0;
-}
-
-.shiftnav-desc-row{
-	display:block;
-	float:left;
-	clear:both;
-	margin-bottom:10px;
-}
-.shiftnav-code-snippet-type{
-	float:left;
-	clear:both;
-	width:60px;
-	padding:10px;
-	font-size:11px;
-	text-transform: uppercase;
-	text-align:right;
-}
-
-h4.shiftnav-settings-section{
-	color:#666;
-	font-size:16px;
-}
-.shiftnav-desc-understated{
-	font-size:12px;
-	color:#999;
-	font-style:italic;
-}
-.image-setting-wrap{
-	float:left;
-}
-.image-setting-wrap img{
-	max-width:200px;
-	background:#eee;
-}
-.set-image-wrapper input.button{
-	clear:both;
-	float:left;
-	margin:10px 10px 10px 0;
-}
-.remove-button{
-	font-size:10px;
-	float:left;
-	padding:15px;
-}
 </style>
 	<?php
 }
-add_action( 'admin_head-appearance_page_shiftnav-settings' , 'shiftnav_admin_panel_styles' );
+//add_action( 'admin_head-appearance_page_shiftnav-settings' , 'shiftnav_admin_panel_styles' );
 
 function shiftnav_admin_panel_assets( $hook ){
 
 	if( $hook == 'appearance_page_shiftnav-settings' ){
 		wp_enqueue_script( 'shiftnav' , SHIFTNAV_URL . 'admin/assets/admin.settings.js' );
+		wp_enqueue_style( 'shiftnav-settings-styles' , SHIFTNAV_URL.'admin/assets/admin.settings.css' );
+		wp_enqueue_style( 'shiftnav-font-awesome' , SHIFTNAV_URL.'assets/css/fontawesome/css/font-awesome.min.css' );
 	}
 }
 add_action( 'admin_enqueue_scripts' , 'shiftnav_admin_panel_assets' );

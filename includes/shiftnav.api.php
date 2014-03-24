@@ -22,12 +22,17 @@ function shiftnav( $id , $settings = array() ){
 	$id_att = strpos( $id , 'shiftnav' ) !== 0 ? 'shiftnav-'.$id : $id;
 
 	?>
+
+
+
+	<!-- ShiftNav #<?php echo $id; ?> -->
 	<div class="<?php echo $class; ?>" id="<?php echo $id_att; ?>" data-shiftnav-id="<?php echo $id; ?>">
-	<?php
+		<div class="shiftnav-inner">
+		<?php
 
 		do_action( 'shiftnav_before' , $id );
 
-		$disable_menu = shiftnav_op( 'disable_menu' , $id ) == 'on' ? true : false;
+		$disable_menu = shiftnav_op( 'disable_menu' , $id , 'off' ) == 'on' ? true : false;
 
 		if( !$disable_menu ){
 
@@ -44,8 +49,17 @@ function shiftnav( $id , $settings = array() ){
 			//Target size
 			$args['menu_class'].= ' shiftnav-targets-'.shiftnav_op( 'target_size' , 'general' );
 
+			//Text size
+			$args['menu_class'].= ' shiftnav-targets-text-'.shiftnav_op( 'text_size' , 'general' );
+
+			//Icon size
+			$args['menu_class'].= ' shiftnav-targets-icon-'.shiftnav_op( 'icon_size' , 'general' );
+
 			//Submenu indent
 			if( shiftnav_op( 'indent_submenus' , $id ) == 'on' ) $args['menu_class'].= ' shiftnav-indent-subs';
+
+			//Active on hover
+			if( shiftnav_op( 'active_on_hover' , 'general' ) == 'on' ) $args['menu_class'].= ' shiftnav-active-on-hover';
 
 
 			if( $menu != '_none' ){
@@ -71,10 +85,17 @@ function shiftnav( $id , $settings = array() ){
 
 		}
 
+		else{
+			echo "\n\n\t\t<!-- ShiftNav Menu Disabled --> \n\n";
+		}
+
 		do_action( 'shiftnav_after' , $id );
 
-	?>
-	</div>
+		?>
+		</div><!-- /.shiftnav-inner -->
+	</div><!-- /.shiftnav #<?php echo $id; ?> -->
+
+
 	<?php
 }
 

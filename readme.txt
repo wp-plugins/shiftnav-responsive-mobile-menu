@@ -4,7 +4,7 @@ Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
 Requires at least: 3.8.1
 Tested up to: 3.8.1
-Stable tag: 0.2
+Stable tag: 1.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,8 @@ Beta release - please post any issues in the forum!
 
 [Knowledgebase](http://sevenspark.com/docs/shiftnav) (in development, expanding soon)
 
+Want to take your menu to the next level?  [Go Pro](http://shiftnav.io/pro)
+
 == Installation ==
 
 Install ShiftNav just like any other WordPress plugin.  
@@ -41,6 +43,21 @@ None. Yet.
 
 
 == Changelog ==
+
+= 1.0 =
+
+* Added unsaved changes alert to menu item in Menus Panel
+* Updated admin styles to work better in Firefox.
+* Allow shortcodes, HTML in toggle content
+* Added spacing in Menu Panel when settings panel is active
+* Added non-transform option (disable "Shift Body")
+* Fixed overflow scrolling and dragging on iOS
+* Moved menu bars icon depending on whether panel is left or right
+* Added Custom CSS Tweaks setting
+* Added active hover state setting
+* Removed disable menu option to avoid confusion (pro only)
+* Added Scroll Lock independently for horizontal and both
+
 
 = 0.2 =
 
@@ -57,6 +74,10 @@ None. Yet.
 Initial Beta Release
 
 == Upgrade Notice ==
+
+= 1.0 =
+
+* Version 1.0 includes a lot of new features - update recommended for everyone
 
 = 0.1 =
 

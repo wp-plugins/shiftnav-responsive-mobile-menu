@@ -1,5 +1,5 @@
 jQuery( document ).ready( function($){
-	$( '.shiftnav_instance_notice_close' ).on( 'click' , function(){
+	$( '.shiftnav_instance_notice_close, .shiftnav_instance_close' ).on( 'click' , function(){
 		$( '.shiftnav_instance_wrap' ).fadeOut();
 	});
 	$( '.shiftnav_instance_wrap' ).on( 'click' , function(e){
@@ -105,6 +105,10 @@ jQuery( document ).ready( function($){
 			else{
 				$( '.shiftnav_instance_container_wrap' ).fadeOut();
 				$( '.shiftnav_instance_delete_notice_success' ).fadeIn();
+
+				var id = response.id;
+				$( '#shiftnav_'+id+', #shiftnav_'+id+'-tab' ).remove();	//delete tab and content
+				$( '.nav-tab-wrapper > a' ).first().click();			//switch to first tab
 			}
 
 		}, 'json' ).fail( function(){
@@ -114,6 +118,28 @@ jQuery( document ).ready( function($){
 
 		
 	}
+
+	function shift_selectText( element ) {
+		var doc = document
+			//, text = element //doc.getElementById(element)
+			, range, selection
+		;
+		if (doc.body.createTextRange) { //ms
+			range = doc.body.createTextRange();
+			range.moveToElementText( element );
+			range.select();
+		} else if (window.getSelection) { //all others
+			selection = window.getSelection();        
+			range = doc.createRange();
+			range.selectNodeContents( element );
+			selection.removeAllRanges();
+			selection.addRange(range);
+		}
+	}
+
+	$( '.shiftnav-highlight-code' ).on( 'click' , function(e){
+		shift_selectText( $(this)[0] );
+	});
 
 	//Open Hash Tab
 	setTimeout( function(){

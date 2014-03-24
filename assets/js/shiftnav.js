@@ -92,7 +92,10 @@
 	
 				$body.addClass( 'shiftnav-enabled' );
 				if( shiftnav_data.lock_body == 'on' ) $body.addClass( 'shiftnav-lock' );
-				$body.wrapInner( '<div class="shiftnav-wrap"></div>' );	//unique
+				if( shiftnav_data.lock_body_x == 'on' ) $body.addClass( 'shiftnav-lock-x' );
+				
+				if( shiftnav_data.shift_body != 'off' ) $body.wrapInner( '<div class="shiftnav-wrap"></div>' );	//unique
+				else $body.addClass( 'shiftnav-disable-shift-body' );
 
 				//Move elements outside of shifter
 				$( '#shiftnav-toggle-main, #wpadminbar' ).appendTo( 'body' );
@@ -100,6 +103,7 @@
 				//Pad top
 				var toggleHeight = $( '#shiftnav-toggle-main' ).outerHeight();
 				$( '.shiftnav-wrap' ).css( 'padding-top' , toggleHeight );
+				if( shiftnav_data.shift_body == 'off' ) $body.css( 'padding-top' , toggleHeight );
 
 				//Setup non-transform
 				if( !shift_supports( 'transform' ) ){
@@ -121,13 +125,15 @@
 			this.$shiftnav.find( '.shiftnav-submenu-activation' ).each( function(){
 				var length = $( this ).outerHeight();
 				$( this ).css( { 'height' : length , 'width' : length } );
-				
+
 				//$( this ).css( 'height' , $( this ).parent( '.menu-item' ).height() );
 			});
 			
 		},
 	
 		initializeTargets: function(){
+
+			var plugin = this;
 
 			this.$shiftnav.on( 'click' , '.shiftnav-target' , function( e ){
 				var scrolltarget = $(this).data( 'shiftnav-scrolltarget' );
@@ -136,7 +142,10 @@
 					if( $target.size() > 0 ){
 						$( 'html,body' ).animate({
 							scrollTop: $target.offset().top
-						}, 1000 );
+						}, 1000 , 'swing' ,
+						function(){
+							plugin.closeShiftNav();	//close the menu after a successful scroll
+						});
 						return false; //don't follow any links if this scroll target is present
 					}
 					//if target isn't present here, redirect with hash
@@ -489,3 +498,9 @@ var shift_supports = (function() {
 		return false;
 	};
 })();
+
+/*
+jQuery('body').on( 'touchstart' , '.shiftnav' , function(e){
+	//e.preventDefault();
+});
+*/

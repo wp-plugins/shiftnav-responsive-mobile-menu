@@ -256,7 +256,7 @@ class ShiftNav_Settings_API {
 	}
 
 	/**
-	 * Displays a textarea for a settings field
+	 * Displays a custom html for a settings field
 	 *
 	 * @param array   $args settings field args
 	 */
@@ -365,10 +365,10 @@ class ShiftNav_Settings_API {
 			$html.= '<img src="'.$src[0].'" />';
 		}
 		$html.= '</span>';
-		$html.= sprintf( '<input type="hidden" class="%1$s-text image-url" id="%2$s[%3$s]" name="%2$s[%3$s]" value="%4$s"/>', $size, $args['section'], $args['id'], $value );
-		$html.= sprintf( '<input type="button" class="button" id="%2$s[%3$s])_button" name="%2$s[%3$s]_button" value="Select"/>', $size, $args['section'], $args['id'] );
+		$html.= sprintf( '<input type="hidden" class="%1$s-text image-url" id="%2$s-%3$s" name="%2$s[%3$s]" value="%4$s"/>', $size, $args['section'], $args['id'], $value );
+		$html.= sprintf( '<input type="button" class="button" id="%2$s-%3$s_button" name="%2$s[%3$s]_button" value="Select"/>', $size, $args['section'], $args['id'] );
 		$html .= sprintf( '<span class="description"> %s</span>', $args['desc'] );
-		$html.= '<a href="#" class="remove-button" data-target-id="'.$args['section'] .'['. $args['id'].']">remove</a>';
+		$html.= '<a href="#" class="remove-button" data-target-id="'.$args['section'] .'-'. $args['id'].'">remove</a>';
 		$html.= '</div>';
 
 		echo $html;
@@ -395,7 +395,7 @@ class ShiftNav_Settings_API {
 			$sanitize_callback = $this->get_sanitize_callback( $option_slug );
 
 			// If callback is set, call it
-			if ( $sanitize_callback ) {
+			if ( $sanitize_callback ) { 
 				$options[ $option_slug ] = call_user_func( $sanitize_callback, $option_value );
 				continue;
 			}
@@ -624,7 +624,12 @@ class ShiftNav_Settings_API {
 				jQuery( '.set-image-wrapper' ).on( 'click' , '.remove-button' , function(e){
 					var $wrap = $( this ).parents( '.set-image-wrapper' );
 					$wrap.find( '.image-setting-wrap' ).html( '' );
-					$( '#' + $( this ).data( 'target-id' ) ).val('');
+
+					//ID contains [] so the brackets need to be escaped
+					var _id = $( this ).data( 'target-id' ).replace( '[' , '\\[' ).replace( ']' , '\\]' );
+					//console.log( _id );
+					$( '#' + _id ).val('');
+					return false;
 				});
 			});
 
