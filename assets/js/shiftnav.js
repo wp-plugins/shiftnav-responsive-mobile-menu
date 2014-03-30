@@ -2,6 +2,7 @@
 *  ShiftNav.js
 *  
 *  http://shiftnav.io
+*  v1.0.2
 *
 *  Copyright Chris Mavricos, SevenSpark http://sevenspark.com
 */
@@ -106,7 +107,21 @@
 				if( shiftnav_data.shift_body == 'off' ) $body.css( 'padding-top' , toggleHeight );
 
 				//Setup non-transform
-				if( !shift_supports( 'transform' ) ){
+				//Some browsers provide false positives for feature detection, so we have to do browser detection as well, sadly
+				var fpos = false;	//falsePositive
+				var ua = navigator.userAgent.toLowerCase();
+
+				if( /android/.test( ua ) ){
+					//always ignore old androids
+					if( /android [1-3]/.test( ua ) ) fpos = true;
+					//always allow Chrome
+					else if( /chrome/.test( ua ) ) fps = false;
+					//Android 4.4+ is okay
+					else if( /android 4.[4-9]/.test( ua ) ) fps = false;
+					else fpos = true;
+				}
+
+				if( !shift_supports( 'transform' ) || fpos ){
 					$body.addClass( 'shiftnav-no-transforms' );
 				}
 				
@@ -137,7 +152,7 @@
 
 			this.$shiftnav.on( 'click' , '.shiftnav-target' , function( e ){
 				var scrolltarget = $(this).data( 'shiftnav-scrolltarget' );
-				if( scrolltarget !== '' ){
+				if( scrolltarget ){
 					var $target = $( scrolltarget ).first();
 					if( $target.size() > 0 ){
 						$( 'html,body' ).animate({
@@ -151,13 +166,23 @@
 					//if target isn't present here, redirect with hash
 					else{
 						var href = $(this).attr( 'href' );
-						if( href.indexOf( '#' ) == -1 ){				//check that hash does not already exist
+						if( href && href.indexOf( '#' ) == -1 ){				//check that hash does not already exist
 							if( scrolltarget.indexOf( '#' ) == -1 ){	//if this is a class, add a hash tag
 								scrolltarget = '#'+scrolltarget;
 							}
 							window.location = href + scrolltarget;		//append hash/scroll target to URL and redirect
 							e.preventDefault();
 						}
+						//No href, no worries
+					}
+				}
+				else if( $( this ).is( 'span' ) ){
+					var $li = $( this ).parent( '.menu-item' );
+					if( $li.hasClass( 'shiftnav-active' ) ){
+						plugin.closeSubmenu( $li , 'disabledLink' , plugin );
+					}
+					else{
+						plugin.openSubmenu( $li , 'disabledLink' , plugin );
 					}
 				}
 			});
@@ -209,13 +234,12 @@
 
 			//this.$toggles.on( 'click', function(e){
 			this.$toggles.on( this.toggleevent, function(e){
-				
+
 				e.preventDefault();
 				e.stopPropagation();				
 				
 				//Ignore click events when toggle is disabled to avoid both touch and click events firing
 				if( e.originalEvent.type == 'click' && $(this).data( 'disableToggle' ) ){
-					console.log( 'nuh-uh' );
 					return;
 				}
 
@@ -327,8 +351,8 @@
 
 		handleTouchoffClose: function( e , _this , plugin ){
 
-			//Only fire if the touch event occurred outside the menus//plugin.$shiftnav.add( plugin.$toggles )
-			//if( $(e.target).parents().index( $( '.shiftnav' ) ) == -1){
+			//Don't fire during transtion
+			if( $( 'body' ).is( '.shiftnav-transitioning' ) ) return;
 
 			if( $(e.target).parents().add( $(e.target) ).filter( '.shiftnav, .shiftnav-toggle, .shiftnav-ignore' ).size() === 0 ){
 
@@ -338,9 +362,7 @@
 				e.preventDefault();
 				e.stopPropagation();
 
-				$( 'body' ).removeClass( 'shiftnav-open' );
-				plugin.$shiftnav.removeClass( 'shiftnav-open-target' );
-				
+				plugin.closeShiftNav();
 				plugin.disableTouchoffClose();
 
 			}
@@ -350,8 +372,12 @@
 
 
 
-		/* Controllers */
 
+		/* Controllers */
+		scrollPanel: function( y ){
+			if( typeof y == 'undefined' ) return this.$shiftnav.find('.shiftnav-inner').scrollTop();
+			else this.$shiftnav.find('.shiftnav-inner').scrollTop( y );
+		},
 
 		openSubmenu: function( $li , tag , plugin ){
 			if( !$li.hasClass( 'shiftnav-active' ) ){
@@ -400,8 +426,14 @@
 			//Actually remove the active class, which causes the submenu to close
 			$li.removeClass( 'shiftnav-active' );
 
+			//Shift Sub Specific
 			if( $li.hasClass( 'shiftnav-sub-shift' ) ){
 				plugin.$shiftnav.removeClass( 'shiftnav-sub-shift-active' );
+
+				//return to original position
+				var y = $li.data( 'scroll-back' );
+				if( y ) plugin.scrollPanel( y );
+
 			}
 
 			$li.trigger( 'shiftnav-close-submenu' );
@@ -490,17 +522,9 @@ var shift_supports = (function() {
   
 		while(len--) {
 			if ( vendors[len] + prop in div.style ) {
-				// browser supports box-shadow. Do what you need.
-				// Or use a bang (!) to test if the browser doesn't.
 				return true;
 			}
 		}
 		return false;
 	};
 })();
-
-/*
-jQuery('body').on( 'touchstart' , '.shiftnav' , function(e){
-	//e.preventDefault();
-});
-*/

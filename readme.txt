@@ -4,7 +4,7 @@ Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
 Requires at least: 3.8.1
 Tested up to: 3.8.1
-Stable tag: 1.0
+Stable tag: 1.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,8 +13,6 @@ Add a native-style, off-canvas, responsive mobile navigation menu to your site.
 == Description ==
 
 ShiftNav is an awesome mobile menu for WordPress.  It looks and acts like native app off-canvas slide-out menus for popular apps like Facebook, Gmail, etc.
-
-Beta release - please post any issues in the forum!
 
 [ShiftNav Demo](http://shiftnav.io/free/)
 
@@ -25,11 +23,18 @@ Beta release - please post any issues in the forum!
 * Light & Dark Skins
 * Works with the WordPress 3 Menu System
 * Touch-enabled
+* CSS3 Transitions produce smooth animations on mobile devices
 * Configurable
 
-[Knowledgebase](http://sevenspark.com/docs/shiftnav) (in development, expanding soon)
+[Knowledgebase](http://sevenspark.com/docs/shiftnav)
 
 Want to take your menu to the next level?  [Go Pro](http://shiftnav.io/pro)
+
+
+= Browser Compatibility =
+
+ShiftNav will open with a slide transition with browsers that support it.  For browsers that don't fully support CSS3 transforms, the menu will fall back to non-animated open/close functionality.
+
 
 == Installation ==
 
@@ -43,6 +48,10 @@ None. Yet.
 
 
 == Changelog ==
+
+= 1.0.1 =
+
+* Improved mobile device detection to fallback on devices that don't support CSS3 transforms
 
 = 1.0 =
 

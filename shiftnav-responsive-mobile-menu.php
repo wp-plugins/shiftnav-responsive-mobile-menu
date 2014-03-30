@@ -6,7 +6,7 @@ Description: An off-canvas mobile menu for WordPress
 Author: Chris Mavricos, SevenSpark
 Author URI: http://sevenspark.com
 License: GPLv2
-Version: 1.0
+Version: 1.0.1
 
 Copyright (C) 2014 Chris Mavricos, SevenSpark
 */

@@ -15,10 +15,13 @@
 	transform: translateX(-290px);
 }
 
-.shiftnav-open #shiftnav-toggle-main{
-	-webkit-transition-delay: .02s;
-	-moz-transition-delay: .02s;
-	-ms-transition-delay: .02s;
-	-o-transition-delay: .02s;
-	transition-delay: .02s;
+//Delay on desktop screens but not mobile devices
+@media screen and (min-width:767px){
+	.shiftnav-open #shiftnav-toggle-main{
+		-webkit-transition-delay: .02s;
+		-moz-transition-delay: .02s;
+		-ms-transition-delay: .02s;
+		-o-transition-delay: .02s;
+		transition-delay: .02s;
+	}
 }
