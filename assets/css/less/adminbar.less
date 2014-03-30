@@ -5,12 +5,21 @@ body.admin-bar .shiftnav{
 body.admin-bar .shiftnav{
 	padding-bottom:32px;
 }
-@media screen and (max-width: 782px){
+@media screen and (min-width:600px) and (max-width: 782px){
 	body.admin-bar #shiftnav-toggle-main,
 	body.admin-bar .shiftnav{
 		top:46px;
 	}
 	body.admin-bar .shiftnav{
 		padding-bottom:46px;
+	}
+}
+@media screen and (max-width:600px){
+	body.admin-bar #shiftnav-toggle-main,
+	body.admin-bar .shiftnav{
+		top:0;
+	}
+	body.admin-bar .shiftnav{
+		padding-bottom:0;
 	}
 }

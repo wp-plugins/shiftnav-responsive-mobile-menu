@@ -14,12 +14,17 @@
 }
 .shiftnav-open .shiftnav-wrap{
 	height:100%;
+}
 
-	-webkit-transition-delay: .01s;
-	-moz-transition-delay: .01s;
-	-ms-transition-delay: .01s;
-	-o-transition-delay: .01s;
-	transition-delay: .01s;
+//Delay on desktop screens but not mobile devices
+@media screen and (min-width:767px){
+	.shiftnav-open .shiftnav-wrap{
+		-webkit-transition-delay: .02s;
+		-moz-transition-delay: .02s;
+		-ms-transition-delay: .02s;
+		-o-transition-delay: .02s;
+		transition-delay: .02s;
+	}
 }
 
 /* Shadow */
@@ -43,4 +48,7 @@
 .shiftnav.shiftnav-right-edge:after{
 	left:-15px;
 	right:auto;
+}
+.shiftnav-no-transforms .shiftnav:after{
+	display:none !important;
 }

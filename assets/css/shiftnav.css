@@ -99,12 +99,14 @@ body.shiftnav-enabled.shiftnav-transition.admin-bar {
   -o-transform: translateX(-290px);
   transform: translateX(-290px);
 }
-.shiftnav-open #shiftnav-toggle-main {
-  -webkit-transition-delay: .02s;
-  -moz-transition-delay: .02s;
-  -ms-transition-delay: .02s;
-  -o-transition-delay: .02s;
-  transition-delay: .02s;
+@media screen and (min-width: 767px) {
+  .shiftnav-open #shiftnav-toggle-main {
+    -webkit-transition-delay: .02s;
+    -moz-transition-delay: .02s;
+    -ms-transition-delay: .02s;
+    -o-transition-delay: .02s;
+    transition-delay: .02s;
+  }
 }
 body.admin-bar #shiftnav-toggle-main,
 body.admin-bar .shiftnav {
@@ -113,13 +115,22 @@ body.admin-bar .shiftnav {
 body.admin-bar .shiftnav {
   padding-bottom: 32px;
 }
-@media screen and (max-width: 782px) {
+@media screen and (min-width: 600px) and (max-width: 782px) {
   body.admin-bar #shiftnav-toggle-main,
   body.admin-bar .shiftnav {
     top: 46px;
   }
   body.admin-bar .shiftnav {
     padding-bottom: 46px;
+  }
+}
+@media screen and (max-width: 600px) {
+  body.admin-bar #shiftnav-toggle-main,
+  body.admin-bar .shiftnav {
+    top: 0;
+  }
+  body.admin-bar .shiftnav {
+    padding-bottom: 0;
   }
 }
 /* WRAPPER */
@@ -137,11 +148,15 @@ body.admin-bar .shiftnav {
 }
 .shiftnav-open .shiftnav-wrap {
   height: 100%;
-  -webkit-transition-delay: .01s;
-  -moz-transition-delay: .01s;
-  -ms-transition-delay: .01s;
-  -o-transition-delay: .01s;
-  transition-delay: .01s;
+}
+@media screen and (min-width: 767px) {
+  .shiftnav-open .shiftnav-wrap {
+    -webkit-transition-delay: .02s;
+    -moz-transition-delay: .02s;
+    -ms-transition-delay: .02s;
+    -o-transition-delay: .02s;
+    transition-delay: .02s;
+  }
 }
 /* Shadow */
 .shiftnav:after {
@@ -163,6 +178,9 @@ body.admin-bar .shiftnav {
 .shiftnav.shiftnav-right-edge:after {
   left: -15px;
   right: auto;
+}
+.shiftnav-no-transforms .shiftnav:after {
+  display: none !important;
 }
 /* MENU PANEL */
 .shiftnav.shiftnav-nojs {
@@ -187,6 +205,7 @@ body.admin-bar .shiftnav {
   -webkit-overflow-scrolling: touch;
   height: 100%;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 .shiftnav.shiftnav-left-edge {
   left: 0;
@@ -216,6 +235,10 @@ body.admin-bar .shiftnav {
   -o-transform: translateX(0);
   transform: translateX(0);
 }
+/* No Transforms */
+.shiftnav-no-transforms .shiftnav {
+  width: 290px;
+}
 .shiftnav-no-transforms .shiftnav.shiftnav-left-edge {
   left: -290px;
 }
@@ -223,10 +246,38 @@ body.admin-bar .shiftnav {
   left: 0;
 }
 .shiftnav-no-transforms .shiftnav.shiftnav-right-edge {
+  left: auto;
   right: -290px;
 }
 .shiftnav-no-transforms.shiftnav-open .shiftnav.shiftnav-open-target.shiftnav-right-edge {
   right: 0;
+}
+.shiftnav-no-transforms .shiftnav,
+.shiftnav-no-transforms #shiftnav-toggle-main {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+.shiftnav-no-transforms.shiftnav-open-left #shiftnav-toggle-main {
+  left: 290px;
+}
+.shiftnav-no-transforms.shiftnav-open-right #shiftnav-toggle-main {
+  left: auto;
+  right: 290px;
+}
+.shiftnav-no-transforms #shiftnav-toggle-main,
+.shiftnav-no-transforms .shiftnav-wrap {
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+  transform: none !important;
+}
+/* Prevent weird link clicking on old android */
+.shiftnav-no-transforms .shiftnav-inner {
+  padding-top: 30px;
 }
 /* Menu Title */
 .shiftnav .shiftnav-menu-title {
@@ -255,6 +306,8 @@ body.admin-bar .shiftnav {
 .shiftnav ul.shiftnav-menu {
   position: relative;
   clear: both;
+  /*overflow-x:hidden;*/
+  overflow: hidden;
 }
 .shiftnav ul.shiftnav-menu,
 .shiftnav ul.shiftnav-menu ul.sub-menu {

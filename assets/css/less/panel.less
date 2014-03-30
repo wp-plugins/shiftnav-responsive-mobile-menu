@@ -23,6 +23,7 @@
 	-webkit-overflow-scrolling:touch;
 	height:100%;
 	overflow-y:scroll;
+	overflow-x:hidden;
 }
 
 .shiftnav.shiftnav-left-edge{
@@ -55,6 +56,11 @@
 	transform: translateX(0);
 }
 
+
+/* No Transforms */
+.shiftnav-no-transforms .shiftnav{
+	width:290px;
+}
 .shiftnav-no-transforms .shiftnav.shiftnav-left-edge{
 	left:-290px;
 }
@@ -62,12 +68,39 @@
 	left:0;
 }
 .shiftnav-no-transforms .shiftnav.shiftnav-right-edge{
+	left:auto;
 	right:-290px;
 }
 .shiftnav-no-transforms.shiftnav-open .shiftnav.shiftnav-open-target.shiftnav-right-edge{
 	right:0;
 }
-
+.shiftnav-no-transforms .shiftnav,
+.shiftnav-no-transforms #shiftnav-toggle-main{
+	-webkit-transition:none;
+	-moz-transition:none;
+	-ms-transition:none;
+	-o-transition:none;
+	transition:none;
+}
+.shiftnav-no-transforms.shiftnav-open-left #shiftnav-toggle-main{
+	left:290px;
+}
+.shiftnav-no-transforms.shiftnav-open-right #shiftnav-toggle-main{
+	left:auto;
+	right:290px;
+}
+.shiftnav-no-transforms #shiftnav-toggle-main,
+.shiftnav-no-transforms .shiftnav-wrap{
+	-webkit-transform: none !important;
+ 	-moz-transform: none !important;
+	-ms-transform: none !important;
+	-o-transform: none !important;
+	transform: none !important;
+}
+/* Prevent weird link clicking on old android */
+.shiftnav-no-transforms .shiftnav-inner{
+	padding-top:30px;
+}
 
 
 /* Menu Title */
@@ -101,6 +134,8 @@
 .shiftnav ul.shiftnav-menu{
 	position:relative;
 	clear:both;
+	/*overflow-x:hidden;*/
+	overflow:hidden;
 }
 .shiftnav ul.shiftnav-menu,
 .shiftnav ul.shiftnav-menu ul.sub-menu{
