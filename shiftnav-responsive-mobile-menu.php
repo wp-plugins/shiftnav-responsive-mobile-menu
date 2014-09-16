@@ -6,10 +6,10 @@ Description: An off-canvas mobile menu for WordPress
 Author: Chris Mavricos, SevenSpark
 Author URI: http://sevenspark.com
 License: GPLv2
-Version: 1.0.1
-
-Copyright (C) 2014 Chris Mavricos, SevenSpark
+Version: 1.2
 */
+
+/* Copyright 2014 Chris Mavricos, SevenSpark */
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
@@ -46,7 +46,7 @@ final class ShiftNav {
 		// Plugin version
 
 		if( ! defined( 'SHIFTNAV_VERSION' ) )
-			define( 'SHIFTNAV_VERSION', '1.0' );
+			define( 'SHIFTNAV_VERSION', '1.2' );
 
 		if( ! defined( 'SHIFTNAV_PRO' ) )
 			define( 'SHIFTNAV_PRO', false );

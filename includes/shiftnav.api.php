@@ -3,9 +3,7 @@
 function shiftnav( $id , $settings = array() ){
 
 	$ops = shiftnav_get_instance_options( $id );
-//echo '['.$id;
-//shiftp( $ops );
-//echo ']';
+
 	extract( wp_parse_args( $settings , array(
 		'theme_location'	=> !empty( $ops['theme_location'] ) ? $ops['theme_location'] : '_none',
 		'menu'				=> !empty( $ops['menu'] ) ? $ops['menu'] : '_none',
@@ -42,7 +40,9 @@ function shiftnav( $id , $settings = array() ){
 				'container'			=> $container,
 				'menu_class' 		=> 'shiftnav-menu',
 				'walker'			=> new ShiftNavWalker,
-				'fallback_cb'		=> 'shiftnav_fallback'
+				'fallback_cb'		=> 'shiftnav_fallback',
+				'depth'				=> 0,
+				'shiftnav'			=> $id,
 			);
 
 
@@ -61,6 +61,9 @@ function shiftnav( $id , $settings = array() ){
 			//Active on hover
 			if( shiftnav_op( 'active_on_hover' , 'general' ) == 'on' ) $args['menu_class'].= ' shiftnav-active-on-hover';
 
+			//Active Highlight
+			if( shiftnav_op( 'active_highlight' , 'general' ) == 'on' ) $args['menu_class'].= '	shiftnav-active-highlight';
+			
 
 			if( $menu != '_none' ){
 				$args['menu'] = $menu;
@@ -108,6 +111,7 @@ function shiftnav_toggle( $target_id , $content = null, $args = array() ){
 
 	if( $content == null ){
 		$content = $ops['toggle_content'];
+		if( !$content ) $content = __( 'Toggle ShiftNav' , 'shiftnav' );
 	}
 
 	_shiftnav_toggle( $target_id , $content, $args );

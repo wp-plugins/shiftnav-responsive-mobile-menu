@@ -40,25 +40,10 @@ function shiftnav_get_settings_fields(){
 			array(
 				'name' => 'display_main',
 				'label' => __( 'Display Main ShiftNav', 'shiftnav' ),
-				'desc' => __( '', 'shiftnav' ),
+				'desc' => __( 'Do not uncheck this unless you want to disable the main ShiftNav panel entirely.', 'shiftnav' ),
 				'type' => 'checkbox',
 				'default' => 'on'
 			),
-
-			
-			/*
-			array(
-				'name'	=> 'edge',
-				'label'	=> __( 'Edge' , 'shiftnav' ),
-				'type'	=> 'radio',
-				'options' => array(
-					'left' => 'Left',
-					'right'=> 'Right',
-				),
-				'default' => 'left'
-
-			),
-			*/
 
 			array(
 				'name'		=> 'edge',
@@ -69,6 +54,14 @@ function shiftnav_get_settings_fields(){
 					'right'	=> 'Right',
 				),
 				'default' 	=> 'left'
+			),
+
+			array(
+				'name' => 'swipe_open',
+				'label' => __( 'Swipe Open', 'shiftnav' ),
+				'desc' => __( 'Swipe to open the main ShiftNav Panel in iOS and Android.  Not all themes will be compatible, as touch swipes can conflict with theme scripts.  Make sure enabling this doesn\'t prevent other touch functionality on your site from working', 'shiftnav' ),
+				'type' => 'checkbox',
+				'default' => 'off'
 			),
 
 			array(
@@ -136,9 +129,16 @@ function shiftnav_get_settings_fields(){
 			array(
 				'name' => 'hide_theme_menu',
 				'label' => __( 'Hide Theme Menu', 'shiftnav' ),
-				'desc' => __( 'Enter the selector of the theme\'s menu if you wish to hide it below the breakpoint above.  For example, <code>#primary-nav</code> or <code>.topnav</code>.', 'shiftnav' ),
+				'desc' => __( 'Enter the selector of the theme\'s menu if you wish to hide it below the breakpoint above.  For example, <code>#primary-nav</code> or <code>.topnav</code>.  ', 'shiftnav' ),
 				'type' => 'text',
 				'default' => ''
+			),
+			array(
+				'name' => 'hide_ubermenu',
+				'label' => __( 'Hide UberMenu', 'shiftnav' ),
+				'desc' => __( 'Hide all UberMenus when ShiftNav is displayed.  If you would like to only hide a specific UberMenu, use the setting above with a specific UberMenu ID.', 'shiftnav' ) . ' ( <a href="http://wpmegamenu.com">What is UberMenu?</a> )',
+				'type' => 'checkbox',
+				'default' => 'off'
 			),
 			array(
 				'name'	=> 'toggle_content',
@@ -148,6 +148,32 @@ function shiftnav_get_settings_fields(){
 				'default' => '[shift_toggle_title]', //get_bloginfo( 'title' )
 				'sanitize_callback' => 'shiftnav_allow_html',
 			),
+
+
+
+			array(
+				'name'	=> 'toggle_close_icon',
+				'label' => __( 'Close Icon' , 'shiftnav' ),
+				'desc'	=> __( 'When the toggle is open, choose which icon to display.', 'shiftnav' ),
+				'type'	=> 'radio',
+				'options' => array(
+					'bars'	=> '<i class="fa fa-bars"></i> Hamburger Bars',
+					'x'		=> '<i class="fa fa-times"></i> Close button',
+				),
+				'default' => 'x',
+			),
+			array(
+				'name'	=> 'toggle_position',
+				'label' => __( 'Toggle Bar Position' , 'shiftnav' ),
+				'desc'	=> __( 'Choose Fixed if you\'d like the toggle bar to always be visible, or Absolute if you\'d like it only to be visible when scrolled to the very top of the page', 'shiftnav' ),
+				'type'	=> 'radio',
+				'options' => array(
+					'fixed'		=> __( 'Fixed', 'shiftnav' ),
+					'absolute'	=> __( 'Absolute' , 'shiftnav' ),
+				),
+				'default' => 'fixed',
+			),
+
 			array(
 				'name'	=> 'align',
 				'label' => __( 'Align Text' , 'shiftnav' ),
@@ -272,11 +298,76 @@ function shiftnav_get_settings_fields(){
 		),
 
 		array(
+			'name' 		=> 'swipe_close',
+			'label' 	=> __( 'Swipe Close', 'shiftnav' ),
+			'desc' 		=> __( 'Enable swiping to close the ShiftNav panel on Android and iOS.  Touch events may not interact well with all themes.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'on'
+		),
+
+		array(
+			'name' 		=> 'swipe_tolerance_x',
+			'label' 	=> __( 'Swipe Tolerance: Horizontal', 'shiftnav' ),
+			'desc' 		=> __( 'The minimum horizontal pixel distance before the swipe is triggered.  Do not include <code>px</code>', 'shiftnav' ),
+			'type' 		=> 'text',
+			'default' 	=> 150
+		),
+
+		array(
+			'name' 		=> 'swipe_tolerance_y',
+			'label' 	=> __( 'Swipe Tolerance: Vertical', 'shiftnav' ),
+			'desc' 		=> __( 'The maximum horizontal pixel distance allowed for the swipe to be triggered.  Do not include <code>px</code>', 'shiftnav' ),
+			'type' 		=> 'text',
+			'default' 	=> 60
+		),
+
+		array(
+			'name' 		=> 'swipe_edge_proximity',
+			'label' 	=> __( 'Swipe Edge Proximity', 'shiftnav' ),
+			'desc' 		=> __( 'The distance from the edge, within which the first touch event must occur for the swipe to be triggered.  Do not include <code>px</code>', 'shiftnav' ),
+			'type' 		=> 'text',
+			'default' 	=> 80
+		),
+
+		array(
+			'name' 		=> 'open_current',
+			'label' 	=> __( 'Open Current Accordion Submenu', 'shiftnav' ),
+			'desc' 		=> __( 'Open the submenu of the current menu item on page load (accordion submenus only).', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
+		),	
+
+		array(
+			'name' 		=> 'collapse_accordions',
+			'label' 	=> __( 'Collapse Accordions', 'shiftnav' ),
+			'desc' 		=> __( 'When an accordion menu is opened, collapse any other accordions on that level.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
+		),
+
+		array(
+			'name' 		=> 'scroll_panel',
+			'label' 	=> __( 'Scroll Shift Submenus to Top', 'shiftnav' ),
+			'desc' 		=> __( 'When a Shift submenu is activated, scroll that item to the top to maximize submenu visibility.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'on'
+		),
+		
+
+		array(
 			'name' 		=> 'active_on_hover',
 			'label' 	=> __( 'Highlight Targets on Hover', 'shiftnav' ),
 			'desc' 		=> __( 'With this setting enabled, the links will be highlighted when hovered or touched.', 'shiftnav' ),
 			'type' 		=> 'checkbox',
-			'default' 	=> 'on'
+			'default' 	=> 'off'
+		),
+
+		array(
+			'name' 		=> 'active_highlight',
+			'label' 	=> __( 'Highlight Targets on :active', 'shiftnav' ),
+			'desc' 		=> __( 'With this setting enabled, the links will be highlighted while in the :active state.  May not be desirable for touch scrolling.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
 		),
 		
 		array(
@@ -317,6 +408,22 @@ function shiftnav_get_settings_fields(){
 			'desc' => __( 'Display menu items based on UberMenu Conditionals settings', 'shiftnav' ),
 			'type' => 'checkbox',
 			'default' => 'off'
+		),
+
+		array(
+			'name' 		=> 'force_filter',
+			'label' 	=> __( 'Force Filter Menu Args', 'shiftnav' ),
+			'desc' 		=> __( 'Some themes will filter the menu arguments on all menus on the site, which can break things.  This will re-filter those arguments for ShiftNav menus only.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
+		),
+
+		array(
+			'name' 		=> 'kill_class_filter',
+			'label' 	=> __( 'Kill Menu Class Filter', 'shiftnav' ),
+			'desc' 		=> __( 'Some themes filter the menu item classes and strip out core WordPress functionality.  This will change the structure of ShiftNav and prevent styles from being applies.  This will prevent any actions on the <code>nav_menu_css_class</code> filter.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'off'
 		),
 
 		

@@ -11,7 +11,8 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 
 	private $index = 0;
 	protected $menuItemOptions;
-	protected $noUberOps;
+	
+	protected $submenu_type;
 
 
 	/**
@@ -101,7 +102,7 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		//Submenus
 		$has_sub = false;
 		if( in_array( 'menu-item-has-children' , $classes ) ) $has_sub = true;
-		$submenu_type = isset( $data['submenu_type'] ) ? $data['submenu_type'] : 'always';
+		$this->submenu_type = $submenu_type = isset( $data['submenu_type'] ) ? $data['submenu_type'] : 'always';
 		if( $has_sub ){
 			$classes[] = 'shiftnav-sub-'.$submenu_type;
 		}
@@ -132,7 +133,6 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		$disable_link = isset( $data['disable_link'] ) && ( $data['disable_link'] == 'on' ) ? true : false;
 
 		
-
 		/**
 		 * Filter the CSS class(es) applied to a menu item's <li>.
 		 *
@@ -279,13 +279,35 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		if ( !$element )
 			return;
 
+		$id_field = $this->db_fields['id'];
+		$id = $element->$id_field;
+
+		$data = shiftnav_get_menu_item_data( $id );
+
+		//If the item is disabled, kill its children, Lannister-style
+		if( isset( $data['disable_item'] ) && ( $data['disable_item'] == 'on' ) ){
+			$this->clear_children( $children_elements , $id );
+			return;
+		}
+
+
 		//UberMenu Conditionals
-		if( shiftnav_op( 'inherit_ubermenu_conditionals' , 'general' ) == 'on' ){
+		if( shiftnav_op( 'inherit_ubermenu_conditionals' , 'general' ) == 'on' ){			
 
-			$id_field = $this->db_fields['id'];
-			$id = $element->$id_field;
+			if( function_exists( 'ubermenu' ) ){
+				$has_children = ! empty( $children_elements[$element->$id_field] );
+				if ( isset( $args[0] ) && is_array( $args[0] ) ){			
+					$args[0]['has_children'] = $has_children;
+				}
+				$cb_args = array_merge( array(&$output, $element, $depth), $args);
 
-			$display_on = apply_filters( 'uberMenu_display_item' , true , $this , $element , $max_depth, $depth, $args );
+				$umitem_obect_class = apply_filters( 'ubermenu_item_object_class' , 'UberMenuItemDefault' , $element , $id , $this->auto_child );
+				$umitem = new $umitem_obect_class( $output , $element , $depth, $cb_args[3], $id , $this , $has_children );	//The $args that get passed to start_el are $cb[3] -- i.e. the 4the element in the array merged above
+				$display_on = apply_filters( 'ubermenu_display_item' , true , $this , $element , $max_depth, $depth, $args , $umitem );
+			}
+			else{
+				$display_on = apply_filters( 'uberMenu_display_item' , true , $this , $element , $max_depth, $depth, $args );
+			}
 
 			if( !$display_on ){
 				$this->clear_children( $children_elements , $id );

@@ -51,6 +51,8 @@
   border-bottom-color: transparent;
 }
 .shiftnav.shiftnav-skin-light ul.shiftnav-menu li.menu-item.current-menu-item > .shiftnav-target,
+.shiftnav.shiftnav-skin-light ul.shiftnav-menu > li.shiftnav-sub-accordion.current-menu-ancestor > .shiftnav-target,
+.shiftnav.shiftnav-skin-light ul.shiftnav-menu > li.shiftnav-sub-shift.current-menu-ancestor > .shiftnav-target,
 .shiftnav.shiftnav-skin-light ul.shiftnav-menu li.menu-item ul.sub-menu .current-menu-item .shiftnav-target {
   color: #ffffff;
   background: #007aff;

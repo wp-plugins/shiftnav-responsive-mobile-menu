@@ -28,6 +28,8 @@
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu li.menu-item.shiftnav-active > .shiftnav-target,
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu li.menu-item.shiftnav-in-transition > .shiftnav-target,
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu li.menu-item.current-menu-item > .shiftnav-target,
+.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu > li.shiftnav-sub-accordion.current-menu-ancestor > .shiftnav-target,
+.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu > li.shiftnav-sub-shift.current-menu-ancestor > .shiftnav-target,
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu.shiftnav-active-highlight li.menu-item > .shiftnav-target:active,
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu.shiftnav-active-on-hover li.menu-item > .shiftnav-target:hover{
 	color:#eee;
@@ -47,9 +49,9 @@
 .shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu li.menu-item > .shiftnav-target{
 	
 }
-.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu li.menu-item > a{							padding-left:50px;	}
-.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > a{				padding-left:75px;	}
-.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > a{	padding-left:100px;	}
+.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu li.menu-item > .shiftnav-target{							padding-left:50px;	}
+.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > .shiftnav-target{				padding-left:75px;	}
+.shiftnav.shiftnav-skin-standard-dark ul.shiftnav-menu ul.sub-menu ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > .shiftnav-target{	padding-left:100px;	}
 
 
 .shiftnav.shiftnav-skin-standard-dark li.menu-item .shiftnav-submenu-activation{

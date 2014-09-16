@@ -22,7 +22,7 @@
 .shiftnav-inner{
 	-webkit-overflow-scrolling:touch;
 	height:100%;
-	overflow-y:scroll;
+	overflow-y:auto;
 	overflow-x:hidden;
 }
 
@@ -124,6 +124,9 @@
 .shiftnav .shiftnav-menu-image-padded{
 	padding:25px;
 }
+.shiftnav .shiftnav-menu-image a{
+	display:block;
+}
 .shiftnav .shiftnav-menu-image img{
 	max-width:100%;
 	height:auto;
@@ -146,6 +149,8 @@
 .shiftnav ul.shiftnav-menu li.menu-item{
 	position:relative;
 	margin:0;
+	padding:0;
+	background:none transparent;
 	list-style-type: none;
 }
 .shiftnav ul.shiftnav-menu li.menu-item > .shiftnav-target,
@@ -181,25 +186,19 @@
 	line-height:inherit;
 }
 
-.shiftnav ul.shiftnav-menu li.shiftnav-retract{
+.shiftnav ul.shiftnav-menu li.shiftnav-retract,
+.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift li.shiftnav-active ~ li.shiftnav-retract{
 	display:none;
 	margin:0;
 }
-.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift li.shiftnav-retract{
+.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift > .sub-menu > li.shiftnav-retract{
 	display:block;
 }
 
 
 /* Menu Items */
 
-.shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item{
-	/*margin-left:100%;*/
-	left:100%;
-}
-.shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item.shiftnav-active{
-	/*margin-left:0;*/
-	left:0;
-}
+
 
 /* Buttons Medium */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-medium li.menu-item > .shiftnav-target{
@@ -259,3 +258,8 @@
 .shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before{
 	vertical-align:middle;
 }
+
+/* Submenu Indentation */
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu li.menu-item > a{							padding-left:50px;	}
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu ul.sub-menu li.menu-item > a{				padding-left:75px;	}
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > a{	padding-left:100px;	}
