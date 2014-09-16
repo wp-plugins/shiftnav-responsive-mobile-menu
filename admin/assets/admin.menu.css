@@ -79,7 +79,7 @@ body.shiftnav-settings-panel-is-open #wpwrap{
 	position:fixed;
 	bottom:0;
 	left:0;
-	z-index:100;
+	z-index:999999;
 
 	transition:all .5s ease;
 

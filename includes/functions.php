@@ -33,6 +33,14 @@ function shiftnav_inject_css(){
 			$css.= "$hide_theme_menu{ display:none !important; } ";
 			$css.= "}\n";
 		}
+		
+		$hide_ubermenu = shiftnav_op( 'hide_ubermenu', 'togglebar' );
+		if( $hide_ubermenu == 'on' ){
+			$toggle_breakpoint = ( (int) $toggle_breakpoint ) - 1;
+			$css.= "\t@media only screen and (max-width:{$toggle_breakpoint}px){ ";
+			$css.= ".ubermenu, .ubermenu-responsive-toggle, #megaMenu{ display:none !important; } ";
+			$css.= "}\n";
+		}
 	}
 
 	$font_size = shiftnav_op( 'font_size' , 'togglebar' );
@@ -56,7 +64,7 @@ function shiftnav_inject_css(){
 
 	<!-- ShiftNav CSS 
 	================================================================ -->
-	<style type="text/css" id="shiftnav-css">
+	<style type="text/css" id="shiftnav-dynamic-css">
 		
 <?php echo $css; ?>
 
@@ -117,7 +125,7 @@ add_action( 'wp_footer', 'shiftnav_direct_injection' );
 
 function shiftnav_main_toggle_content(){
 	//echo '[_'.shiftnav_op( 'toggle_content' , 'togglebar' ).'_]';
-	return do_shortcode( shiftnav_op( 'toggle_content' , 'togglebar' ) );
+	return '<span class="shiftnav-main-toggle-content shiftnav-toggle-main-block">' . do_shortcode( shiftnav_op( 'toggle_content' , 'togglebar' ) ) . '</span>';
 	//return '<a href="'.get_home_url().'"><em>SHIFT</em>NAV</a>';
 }
 
@@ -133,11 +141,26 @@ function _shiftnav_toggle( $target_id , $content = '', $args = array() ){
 
 	$content = do_shortcode( $content );
 
-	if( $id && $id == 'shiftnav-toggle-main' ) $class = 'shiftnav-toggle-edge-'.shiftnav_op( 'edge' , 'shiftnav-main' ) . ' ' . $class;
+	$main_toggle = false;
+	if( $id && $id == 'shiftnav-toggle-main' ) $main_toggle = true;
+
+	if( $main_toggle ){
+		$class = 'shiftnav-toggle-edge-'.shiftnav_op( 'edge' , 'shiftnav-main' );
+		$class.= ' shiftnav-toggle-icon-'.shiftnav_op( 'toggle_close_icon' , 'togglebar' );
+
+		if( shiftnav_op( 'toggle_position' , 'togglebar' ) == 'absolute' ){
+			$class.= ' shiftnav-toggle-position-absolute';
+		}
+
+		$class.= ' ' . $class;
+	}
 
 	echo "<$el ";
 		if( $id ): ?>id="<?php echo $id; ?>"<?php endif; 
-		?> class="shiftnav-toggle shiftnav-toggle-<?php echo $target_id; ?> <?php echo $class; ?>" data-shiftnav-target="<?php echo $target_id; ?>"><?php echo $content; 
+		?> class="shiftnav-toggle shiftnav-toggle-<?php echo $target_id; ?> <?php echo $class; ?>" data-shiftnav-target="<?php echo $target_id; ?>"><?php 
+		do_action( 'shiftnav_toggle_before_content' , $main_toggle , $target_id , $id );
+		echo apply_filters( 'shiftnav_toggle_content' , $content , $target_id , $id );
+		do_action( 'shiftnav_toggle_after_content' , $main_toggle , $target_id , $id );
 	echo "</$el>"; ?>
 	<?php
 }
@@ -155,7 +178,7 @@ function shiftnav_toggle_shortcode( $atts, $content ){
 
 	ob_start();
 
-	shiftnav_toggle( $target , $content , $toggle_id , $el );
+	shiftnav_toggle( $target , $content , array( 'id' => $toggle_id , 'el' => $el ) );
 
 	$toggle = ob_get_contents();
 
@@ -178,10 +201,10 @@ add_action( 'init', 'shiftnav_register_theme_locations' );
 function shiftnav_load_assets(){
 
 	$assets = SHIFTNAV_URL . 'assets/';
-	wp_enqueue_style( 'shiftnav' , $assets.'css/shiftnav.css' );
+	wp_enqueue_style( 'shiftnav' , $assets.'css/shiftnav.css' , false , SHIFTNAV_VERSION );
 
 	if( shiftnav_op( 'load_fontawesome' , 'general' ) == 'on' ){
-		wp_enqueue_style( 'shiftnav-font-awesome' , $assets.'css/fontawesome/css/font-awesome.min.css' );
+		wp_enqueue_style( 'shiftnav-font-awesome' , $assets.'css/fontawesome/css/font-awesome.min.css' , false , SHIFTNAV_VERSION );
 	}
 
 	//Load Required Skins
@@ -197,9 +220,17 @@ function shiftnav_load_assets(){
 	wp_enqueue_script( 'shiftnav' , $assets.'js/shiftnav.js' , array( 'jquery' ) , SHIFTNAV_VERSION , true );
 
 	wp_localize_script( 'shiftnav' , 'shiftnav_data' , array( 
-		'shift_body'	=>	shiftnav_op( 'shift_body' , 'general' ),
-		'lock_body'		=>	shiftnav_op( 'lock_body' , 'general' ),
-		'lock_body_x'	=>	shiftnav_op( 'lock_body_x' , 'general' ),
+		'shift_body'			=>	shiftnav_op( 'shift_body' , 'general' ),
+		'lock_body'				=>	shiftnav_op( 'lock_body' , 'general' ),
+		'lock_body_x'			=>	shiftnav_op( 'lock_body_x' , 'general' ),
+		'swipe_close'			=>	shiftnav_op( 'swipe_close' , 'general' ),
+		'swipe_open'			=>	shiftnav_op( 'swipe_open' , 'shiftnav-main' ),
+		'swipe_tolerance_x'		=>	shiftnav_op( 'swipe_tolerance_x' , 'general' ),
+		'swipe_tolerance_y'		=>	shiftnav_op( 'swipe_tolerance_y' , 'general' ),
+		'swipe_edge_proximity'	=>	shiftnav_op( 'swipe_edge_proximity' , 'general' ),
+		'open_current'			=>	shiftnav_op( 'open_current' , 'general' ),
+		'collapse_accordions'	=> 	shiftnav_op( 'collapse_accordions' , 'general' ),
+		'scroll_panel'			=>	shiftnav_op( 'scroll_panel' , 'general' ),
 	) );
 }
 add_action( 'wp_enqueue_scripts' , 'shiftnav_load_assets' , 21 );
@@ -255,18 +286,51 @@ add_shortcode('shift_toggle_title', 'shiftnav_default_toggle_content');
 function shiftnav_main_site_title( $instance_id ){
 	if( shiftnav_op( 'display_site_title' , $instance_id ) == 'on' ):
 	?>
-	<h3 class="shiftnav-menu-title shiftnav-site-title"><a href="<?php bloginfo( 'url' ); ?>"><?php bloginfo(); ?></a></h2>
+	<h3 class="shiftnav-menu-title shiftnav-site-title"><a href="<?php bloginfo( 'url' ); ?>"><?php bloginfo(); ?></a></h3>
 	<?php
 	endif;
 
 	if( shiftnav_op( 'display_instance_title' , $instance_id ) == 'on' ):
 	?>
-	<h3 class="shiftnav-menu-title shiftnav-instance-title"><?php echo shiftnav_op( 'instance_name' , $instance_id ); ?></a></h2>
+	<h3 class="shiftnav-menu-title shiftnav-instance-title"><?php echo shiftnav_op( 'instance_name' , $instance_id ); ?></h3>
 	<?php
 	endif;
 
 }
 add_action( 'shiftnav_before' , 'shiftnav_main_site_title' , 10 );
+
+
+
+/* Stop Interference */
+add_action( 'wp_head' , 'shiftnav_prevent_interference' );
+function shiftnav_prevent_interference(){
+	if( shiftnav_op( 'force_filter' , 'general' ) == 'on' ){
+		add_filter( 'wp_nav_menu_args' , 'shiftnav_force_filter' );
+	}
+	if( shiftnav_op( 'kill_class_filter' , 'general' ) == 'on' ){
+		remove_all_filters( 'nav_menu_css_class' );
+	}
+}
+
+/* Force Filter */
+function shiftnav_force_filter( $args ){
+
+	if( isset( $args['shiftnav'] ) ){
+		$args['container_class'] 	= 'shiftnav-nav';
+		$args['container']			= 'nav';
+		$args['menu_class']			= 'shiftnav-menu';
+		$args['walker']				= new ShiftNavWalker;
+		$args['fallback_cb']		= 'shiftnav_fallback';
+		$args['depth']				= 0;
+	}
+
+	return $args;
+}
+
+
+
+
+
 
 function shiftnav_user_is_admin(){
 	return current_user_can( 'manage_options' );

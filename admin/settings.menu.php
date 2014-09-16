@@ -46,7 +46,7 @@ function shiftnav_menu_item_settings_panel(){
 			<div class="shiftnav-menu-item-panel-info" >
 
 				<div class="shiftnav-menu-item-stats shift-clearfix">
-					<div class="shiftnav-menu-item-title">Menu Item Florgenstein</div>
+					<div class="shiftnav-menu-item-title">Menu Item [Unknown]</div>
 					<div class="shiftnav-menu-item-id">#menu-item-X</div>
 					<div class="shiftnav-menu-item-type">Custom</div>		
 				</div>
@@ -267,18 +267,18 @@ function shiftnav_menu_item_settings(){
 
 	$settings['general'][10] = array(
 		'id' 		=> 'disable_link',
-		'title'		=> 'Disable Link',
+		'title'		=> __( 'Disable Link', 'shiftnav' ),
 		'type'		=> 'checkbox',
 		'default' 	=> 'off',
-		'desc'		=> 'Check this box to remove the link from this item; clicking a disabled link will not result in any URL being followed.'
+		'desc'		=> __( 'Check this box to remove the link from this item; clicking a disabled link will not result in any URL being followed.' , 'shiftnav' ),
 	);
 
 	$settings['general'][20] = array(
 		'id' 		=> 'highlight',
-		'title'		=> 'Highlight Link',
+		'title'		=> __( 'Highlight Link', 'shiftnav' ),
 		'type'		=> 'checkbox',
 		'default' 	=> 'off',
-		'desc'		=> 'Highlight this menu item'
+		'desc'		=> __( 'Highlight this menu item' , 'shiftnav' ),
 	);
 
 
@@ -294,10 +294,18 @@ function shiftnav_menu_item_settings(){
 
 	$settings['general'][40] = array(
 		'id' 		=> 'scrollto',
-		'title'		=> 'Scroll To',
+		'title'		=> __( 'Scroll To' , 'shiftnav' ),
 		'type'		=> 'text',
 		'default' 	=> '',
-		'desc'		=> 'The selector for an item to scroll to when clicked, if present.  Example: <code>#section-1</code>',
+		'desc'		=> __( 'The selector for an item to scroll to when clicked, if present.  Example: <code>#section-1</code>', 'shiftnav' )
+	);
+
+	$settings['general'][80] = array(
+		'id' 		=> 'disable_item',
+		'title'		=> __( 'Disable Item', 'shiftnav' ),
+		'type'		=> 'checkbox',
+		'default' 	=> 'off',
+		'desc'		=> __( 'Hide this item.  Useful if this menu is being reused in multiple locations, but item should not be displayed in ShiftNav', 'shiftnav' ),
 	);
 
 	/*
@@ -312,12 +320,12 @@ function shiftnav_menu_item_settings(){
 
 	$settings['submenu'][20] = array(
 		'id' 		=> 'submenu_type',
-		'title'		=> 'Submenu Type',
+		'title'		=> __( 'Submenu Type', 'shiftnav' ),
 		'type'		=> 'select',
 		'default'	=> 'always',
 		'desc'		=> '',
 		'ops'		=> array(
-						'always'	=>	'Always showing',
+						'always'	=>	__( 'Always showing', 'shiftnav' ),
 					),
 	);
 

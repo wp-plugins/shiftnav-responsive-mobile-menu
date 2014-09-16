@@ -2,7 +2,6 @@
 *  ShiftNav.js
 *  
 *  http://shiftnav.io
-*  v1.0.2
 *
 *  Copyright Chris Mavricos, SevenSpark http://sevenspark.com
 */
@@ -16,7 +15,12 @@
 			touchOffClose: true,
 			clicktest: false,
 			windowstest: false,
-			debug: false
+			debug: false,
+			swipe_tolerance_x: 150,			//min distance to swipe
+			swipe_tolerance_y: 30,			//max vertical displacement
+			swipe_edge_proximity: 70,		//maximum distance from edge
+			open_current: false,
+			collapse_accordions: false
 		};
 
 	function Plugin ( element, options ) {
@@ -24,6 +28,7 @@
 		this.element = element;
 
 		this.$shiftnav = $( this.element );
+		this.$menu = this.$shiftnav.find( 'ul.shiftnav-menu' );
 
 		this.settings = $.extend( {}, defaults, options );
 		this._defaults = defaults;
@@ -75,9 +80,10 @@
 			this.initializeSubmenuToggleMouseEvents();
 			this.initializeRetractors();
 			this.initializeResponsiveToggle();
+			this.initializeSwipeHandler();
 
 			//this.initializeTouchoffClose();  //attached on open instead
-		
+
 		},
 
 
@@ -86,7 +92,8 @@
 
 		initializeShiftNav: function(){
 		
-			var $body = $('body');
+			var $body = $('body'),
+				plugin = this;
 
 			//Only enable the site once
 			if( !$body.hasClass( 'shiftnav-enabled' ) ){
@@ -101,9 +108,11 @@
 				//Move elements outside of shifter
 				$( '#shiftnav-toggle-main, #wpadminbar' ).appendTo( 'body' );
 
+				var $wrap = $( '.shiftnav-wrap' );
+
 				//Pad top
 				var toggleHeight = $( '#shiftnav-toggle-main' ).outerHeight();
-				$( '.shiftnav-wrap' ).css( 'padding-top' , toggleHeight );
+				$wrap.css( 'padding-top' , toggleHeight );
 				if( shiftnav_data.shift_body == 'off' ) $body.css( 'padding-top' , toggleHeight );
 
 				//Setup non-transform
@@ -115,15 +124,121 @@
 					//always ignore old androids
 					if( /android [1-3]/.test( ua ) ) fpos = true;
 					//always allow Chrome
-					else if( /chrome/.test( ua ) ) fps = false;
+					else if( /chrome/.test( ua ) ) fpos = false;
 					//Android 4.4+ is okay
-					else if( /android 4.[4-9]/.test( ua ) ) fps = false;
+					else if( /android 4.[4-9]/.test( ua ) ) fpos = false;
 					else fpos = true;
 				}
 
 				if( !shift_supports( 'transform' ) || fpos ){
 					$body.addClass( 'shiftnav-no-transforms' );
 				}
+
+
+				//Setup swipe open on MAIN SHIFTNAV only
+				if( shiftnav_data.swipe_open == 'on' ){
+					var wrap_start_y = 0,
+						wrap_start_x = 0,
+						wrap_cur_y = 0,
+						wrap_cur_x = 0,
+						viewport_width = $( window ).width();
+
+
+					if( shiftnav_data.shift_body == 'off' ) $wrap = $( 'body' );
+
+					$wrap.on( 'touchstart' , function( e ){
+						wrap_start_y = e.originalEvent.changedTouches[0].pageY;
+						wrap_start_x = e.originalEvent.changedTouches[0].pageX;
+						//console.log( "START: " + wrap_start_x );
+					});
+
+					//Left edge activate on swipe from left
+					if( $( '#shiftnav-main' ).hasClass( 'shiftnav-left-edge' ) ){
+						$wrap.on( 'touchmove' , function( e ){
+							wrap_cur_x = e.originalEvent.changedTouches[0].pageX;
+							//console.log( wrap_cur_x );
+
+							//if close to left edge 
+							if( wrap_start_x < plugin.settings.swipe_edge_proximity ){
+								e.preventDefault();
+
+								//if swipe more than 150
+								if( wrap_cur_x - wrap_start_x > plugin.settings.swipe_tolerance_x ){
+									wrap_cur_y = e.originalEvent.changedTouches[0].pageY;
+									if( Math.abs( wrap_cur_y - wrap_start_y ) < plugin.settings.swipe_tolerance_y ){
+										plugin.openShiftNav();
+										e.stopPropagation();
+									}
+								}
+							}
+						});
+					}
+					//Right edge activate on swipe from right
+					else{
+						$wrap.on( 'touchmove' , function( e ){
+							wrap_cur_x = e.originalEvent.changedTouches[0].pageX;
+
+							//if we start from the edge, tell android we've got this covered
+							if( wrap_start_x > ( viewport_width - plugin.settings.swipe_edge_proximity ) ){
+								e.preventDefault();
+
+								//if swipe more than 150, open panel
+								if( ( wrap_start_x - wrap_cur_x > plugin.settings.swipe_tolerance_x ) ){
+									wrap_cur_y = e.originalEvent.changedTouches[0].pageY;
+									if( Math.abs( wrap_cur_y - wrap_start_y ) < plugin.settings.swipe_tolerance_y ){
+										plugin.openShiftNav();
+										e.stopPropagation();
+									}
+								}
+							}
+							
+							
+						});
+					}
+				}
+
+				//Handle searchbar toggle
+				$( '.shiftnav-searchbar-toggle' ).on( this.toggleevent , function( e ){
+					e.stopPropagation();
+					e.preventDefault();
+
+					var $drop = $( this ).next( '.shiftnav-searchbar-drop' );
+
+					//Close
+					if( $drop.hasClass( 'shiftnav-searchbar-drop-open' ) ){
+						$drop.removeClass( 'shiftnav-searchbar-drop-open' );
+						$( 'body' ).off( 'click.shiftnav-searchbar-drop' );
+					}
+					//Open
+					else{
+						$drop.addClass( 'shiftnav-searchbar-drop-open' );
+						$drop.find( '.shiftnav-search-input' ).focus();
+
+						//Close on click-off - can't do this immediately because IE is so damn dumb
+						setTimeout( function(){
+							$( 'body' ).on( 'click.shiftnav-searchbar-drop' , function( e ){
+								$( '.shiftnav-searchbar-drop' ).removeClass( 'shiftnav-searchbar-drop-open' );
+								$( 'body' ).off( 'click.shiftnav-searchbar-drop' );
+							});
+						}, 100);
+					}
+				});
+				$( '.shiftnav-searchbar-drop' ).on( this.toggleevent , function( e ){
+					e.stopPropagation();
+				});
+				$( '.shiftnav-searchbar-drop .shiftnav-search-input').on( 'blur' , function( e ){
+					if( $( this ).val() == '' && !toggle_clicked ){
+						$( this ).parents( '.shiftnav-searchbar-drop' ).removeClass( 'shiftnav-searchbar-drop-open' );
+					}
+				});
+				var toggle_clicked;
+				$( '.shiftnav-searchbar-toggle' ).on( 'mousedown' , function( e ){
+					toggle_clicked = true;
+				});
+				$( '.shiftnav-searchbar-toggle' ).on( 'mouseup' , function( e ){
+					toggle_clicked = false;
+				});
+				
 				
 			}
 
@@ -143,6 +258,13 @@
 
 				//$( this ).css( 'height' , $( this ).parent( '.menu-item' ).height() );
 			});
+
+
+
+			//Current open
+			if( plugin.settings.open_current ){
+				$( '.shiftnav .shiftnav-sub-accordion.current-menu-item, .shiftnav .shiftnav-sub-accordion.current-menu-item-ancestor' ).addClass( 'shiftnav-active' );
+			}
 			
 		},
 	
@@ -236,7 +358,7 @@
 			this.$toggles.on( this.toggleevent, function(e){
 
 				e.preventDefault();
-				e.stopPropagation();				
+				e.stopPropagation();
 				
 				//Ignore click events when toggle is disabled to avoid both touch and click events firing
 				if( e.originalEvent.type == 'click' && $(this).data( 'disableToggle' ) ){
@@ -266,6 +388,100 @@
 
 		},
 
+		initializeSwipeHandler: function(){
+
+			var $body = $('body'),
+				start_y = 0,
+				start_x = 0,
+				cur_y = 0,
+				cur_x = 0,
+				plugin = this,
+				scrollprevented = false,
+				viewport_height = $(window).height(),
+				$scrollPanel = this.$shiftnav.find( '.shiftnav-inner' );
+
+			//Track where touches start
+			$scrollPanel.on( 'touchstart' , function( e ){
+				start_y = e.originalEvent.changedTouches[0].pageY;
+				start_x = e.originalEvent.changedTouches[0].pageX;
+			});
+
+			//On drag, when at extents of scroll panel, prevent scrolling of background
+			$scrollPanel.on( this.touchMove , function( e ){
+
+				scrollprevented = false;	//keep track to maximize efficiency
+
+				//If the ShiftNav panel is too short to scroll, prevent scrolling entirely
+				//Check here because panel height can change when submenus are expanded
+				if( viewport_height >= $scrollPanel[0].scrollHeight ){
+					scrollprevented = true;
+					e.preventDefault();
+				}
+				//If at top of scroll panel, prevent scrolling up
+				else if( e.currentTarget.scrollTop === 0 ){
+					cur_y = e.originalEvent.changedTouches[0].pageY;
+					if( cur_y > start_y ){
+						//console.log( 'TOP | scrolling up' );
+						scrollprevented = true;
+						e.preventDefault();
+					}
+				}
+				//If at bottom of scroll panel, prevent scrolling down
+				else if( e.currentTarget.scrollHeight === e.currentTarget.scrollTop + e.currentTarget.offsetHeight ){
+					cur_y = e.originalEvent.changedTouches[0].pageY;
+					if( cur_y < start_y ){
+						//console.log( 'TOP | scrolling up' );
+						scrollprevented = true;
+						e.preventDefault();
+					}
+				}
+
+				//If the scroll hasn't already been nuked, but
+				//we're scrolling horizontally instead of vertically, stop that
+				if( !scrollprevented ){
+					diff_y = Math.abs( start_y - e.originalEvent.changedTouches[0].pageY );
+					diff_x = Math.abs( start_x - e.originalEvent.changedTouches[0].pageX );
+					if( diff_y < diff_x ){
+						e.preventDefault();
+					}
+				}
+			});
+
+			//Swipe in the appropriate direction to close the menu
+			if( shiftnav_data.swipe_close == 'on' ){
+
+				if( this.$shiftnav.hasClass( 'shiftnav-right-edge' ) ){
+					$scrollPanel.on( 'touchmove' , function( e ){
+						cur_x = e.originalEvent.changedTouches[0].pageX;
+						//console.log( cur_x );
+						if( cur_x - start_x > plugin.settings.swipe_tolerance_x ){
+							if( Math.abs( cur_y - start_y ) < plugin.settings.swipe_tolerance_y ){
+								plugin.closeShiftNav();
+								e.preventDefault();
+							}
+						}
+					});
+				}
+				else{
+					$scrollPanel.on( 'touchmove' , function( e ){
+						cur_x = e.originalEvent.changedTouches[0].pageX;
+						//console.log( cur_x );
+						if( start_x - cur_x > plugin.settings.swipe_tolerance_x ){
+							cur_y = e.originalEvent.changedTouches[0].pageY;
+							if( Math.abs( cur_y - start_y ) < plugin.settings.swipe_tolerance_y ){
+								plugin.closeShiftNav();
+								e.preventDefault();
+							}
+						}
+						e.stopPropagation();
+					});
+				}
+			}
+
+			
+
+		},
+
 		openShiftNav: function(){
 
 			var plugin = this;
@@ -286,6 +502,7 @@
 					});
 
 			this.initializeTouchoffClose();
+			
 		},
 
 		closeShiftNav: function(){
@@ -372,29 +589,61 @@
 
 
 
-
 		/* Controllers */
 		scrollPanel: function( y ){
-			if( typeof y == 'undefined' ) return this.$shiftnav.find('.shiftnav-inner').scrollTop();
-			else this.$shiftnav.find('.shiftnav-inner').scrollTop( y );
+			if( shiftnav_data.scroll_panel == 'off' ) return 0;
+			
+			if( typeof y == 'undefined' ){
+				return this.$shiftnav.find( '.shiftnav-inner' ).scrollTop();
+			}
+			else{
+				this.$shiftnav.find( '.shiftnav-inner' ).scrollTop( y );
+			}
 		},
 
 		openSubmenu: function( $li , tag , plugin ){
 			if( !$li.hasClass( 'shiftnav-active' ) ){
+
+				//plugin.setMinimumHeight( 'open' , $li );
+
 				if( $li.hasClass( 'shiftnav-sub-shift' ) ){
+					
 					$li.siblings( '.shiftnav-active' ).removeClass( 'shiftnav-active' );
 					
 					//switch to position absolute, then delay activation below due to Firefox browser bug
 					$li.toggleClass( 'shiftnav-caulk' );
-					
+				
 					plugin.$shiftnav.addClass( 'shiftnav-sub-shift-active' );
+
 				}
+				else{
+					if( plugin.settings.collapse_accordions ){
+						$li.siblings( '.shiftnav-active' ).removeClass( 'shiftnav-active' );
+					}
+				}
+
+				//Active flags
+				$li.parents( 'ul' ).removeClass( 'shiftnav-sub-active-current' );
+				$li.find( '> ul' )
+					.addClass( 'shiftnav-sub-active' )
+					.addClass( 'shiftnav-sub-active-current' );
 
 				//A dumb timeout hack to fix this FireFox browser bug https://bugzilla.mozilla.org/show_bug.cgi?id=625289
 				setTimeout( function(){
 					$li.addClass( 'shiftnav-active' );
-					$li.trigger( 'shiftnav-open-submenu' );
+					$li.trigger( 'shiftnav-open-submenu' );	//API
 					$li.removeClass( 'shiftnav-caulk' );
+
+					//Wait until item has moved before calculating position
+					setTimeout( function(){
+						//scroll to top of the menu, make note of initial position
+						var y = plugin.scrollPanel();
+						$li.data( 'scroll-back' , y );
+						var scrollPanelTo = $li.offset().top + y;
+						plugin.scrollPanel( scrollPanelTo );
+						//plugin.scrollPanel( 0 );
+					}, 100 );
+					
 				}, 1 );
 			}
 		},
@@ -428,15 +677,22 @@
 
 			//Shift Sub Specific
 			if( $li.hasClass( 'shiftnav-sub-shift' ) ){
-				plugin.$shiftnav.removeClass( 'shiftnav-sub-shift-active' );
+				if( $li.parents( '.shiftnav-sub-shift' ).size() == 0 ) plugin.$shiftnav.removeClass( 'shiftnav-sub-shift-active' );
 
 				//return to original position
 				var y = $li.data( 'scroll-back' );
-				if( y ) plugin.scrollPanel( y );
+				if( y !== 'undefined' ) plugin.scrollPanel( y );
+				//console.log( 'y = ' + y );
 
 			}
 
-			$li.trigger( 'shiftnav-close-submenu' );
+			//Active flags
+			$li.find( '> ul' )
+				.removeClass( 'shiftnav-sub-active' )
+				.removeClass( 'shiftnav-sub-active-current' );
+			$li.closest( 'ul' ).addClass( 'shiftnav-sub-active-current' );
+
+			$li.trigger( 'shiftnav-close-submenu' );	//API
 			
 		},
 
@@ -497,10 +753,16 @@ jQuery( document ).ready( function($){
 
 	//Run ShiftNav
 	jQuery( '.shiftnav' ).shiftnav({
+		swipe_tolerance_x : parseInt( shiftnav_data.swipe_tolerance_x ),
+		swipe_tolerance_y : parseInt( shiftnav_data.swipe_tolerance_y ),
+		swipe_edge_proximity : parseInt( shiftnav_data.swipe_edge_proximity ),
+		open_current : shiftnav_data.open_current == 'on' ? true : false,
+		collapse_accordions : shiftnav_data.collapse_accordions == 'on' ? true : false
 		//debug: true
 		//mouseEvents: false
 		//clicktest: true
 	});
+
 });
 
 

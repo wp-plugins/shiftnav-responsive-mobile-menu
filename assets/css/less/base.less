@@ -2,8 +2,7 @@
 .shiftnav-toggle, 
 .shiftnav-toggle *,
 .shiftnav,
-.shiftnav *,
-.shiftnav-wrap{
+.shiftnav *{
 	-webkit-box-sizing:border-box;
 	-moz-box-sizing:border-box;
 	-ms-box-sizing:border-box;
@@ -11,6 +10,16 @@
 	box-sizing:border-box;
 	line-height: 1.3em;	
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
+
+	padding:0;
+	margin:0;
+	background:none transparent;
+}
+.shiftnav-wrap{
+	padding:0;
+	margin:0;
+	background:none;
+	position:relative;
 }
 
 body.shiftnav-lock-x.shiftnav-enabled{

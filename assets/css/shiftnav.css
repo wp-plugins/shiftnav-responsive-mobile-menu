@@ -2,8 +2,7 @@
 .shiftnav-toggle,
 .shiftnav-toggle *,
 .shiftnav,
-.shiftnav *,
-.shiftnav-wrap {
+.shiftnav * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -11,6 +10,15 @@
   box-sizing: border-box;
   line-height: 1.3em;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  padding: 0;
+  margin: 0;
+  background: none transparent;
+}
+.shiftnav-wrap {
+  padding: 0;
+  margin: 0;
+  background: none;
+  position: relative;
 }
 body.shiftnav-lock-x.shiftnav-enabled {
   overflow-x: hidden;
@@ -38,7 +46,7 @@ body.shiftnav-enabled.shiftnav-transition.admin-bar {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 16px 40px;
+  padding: 0 10px;
   z-index: 5000;
   -webkit-transition: -webkit-transform 0.5s;
   -moz-transition: -moz-transform 0.5s;
@@ -63,22 +71,51 @@ body.shiftnav-enabled.shiftnav-transition.admin-bar {
   color: inherit;
   text-decoration: none;
 }
+#shiftnav-toggle-main .shiftnav-main-toggle-content-before {
+  float: left;
+}
+#shiftnav-toggle-main .shiftnav-main-toggle-content-after {
+  float: right;
+}
+#shiftnav-toggle-main.shiftnav-toggle-main-align-center .shiftnav-main-toggle-content {
+  width: 100%;
+  position: absolute;
+  left: 0;
+}
+.shiftnav-toggle-main-block {
+  padding: 16px 20px;
+  display: inline-block;
+}
+.shiftnav-toggle-main-ontop {
+  position: relative;
+  z-index: 20;
+}
 /* Bars */
 #shiftnav-toggle-main:before {
-  position: absolute;
-  left: 20px;
-  /*content: '\2261';*/
+  /*position:absolute;
+	left:20px;
+	/*content: '\2261';*/
+  float: left;
   content: '\f0c9';
   font-family: FontAwesome;
+  padding: 16px 10px;
+}
+.shiftnav-open #shiftnav-toggle-main.shiftnav-toggle-icon-x:before {
+  content: '\f00d';
 }
 .shiftnav-open-right #shiftnav-toggle-main:before,
 #shiftnav-toggle-main.shiftnav-toggle-edge-right:before {
-  left: auto;
-  right: 20px;
+  /*left:auto;
+	right:20px;*/
+  float: right;
+  padding-left: 20px;
 }
 .shiftnav-open-left #shiftnav-toggle-main.shiftnav-toggle-edge-right:before {
-  left: 20px;
-  right: auto;
+  /*left:20px;
+	right:auto;*/
+  float: left;
+  padding-left: 0;
+  padding-right: 20px;
 }
 .shiftnav-force #shiftnav-toggle-main {
   display: block !important;
@@ -131,6 +168,9 @@ body.admin-bar .shiftnav {
   }
   body.admin-bar .shiftnav {
     padding-bottom: 0;
+  }
+  html #wpadminbar {
+    top: 54px;
   }
 }
 /* WRAPPER */
@@ -204,7 +244,7 @@ body.admin-bar .shiftnav {
 .shiftnav-inner {
   -webkit-overflow-scrolling: touch;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 .shiftnav.shiftnav-left-edge {
@@ -318,6 +358,8 @@ body.admin-bar .shiftnav {
 .shiftnav ul.shiftnav-menu li.menu-item {
   position: relative;
   margin: 0;
+  padding: 0;
+  background: none transparent;
   list-style-type: none;
 }
 .shiftnav ul.shiftnav-menu li.menu-item > .shiftnav-target,
@@ -351,22 +393,15 @@ body.admin-bar .shiftnav {
   display: inline-block;
   line-height: inherit;
 }
-.shiftnav ul.shiftnav-menu li.shiftnav-retract {
+.shiftnav ul.shiftnav-menu li.shiftnav-retract,
+.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift li.shiftnav-active ~ li.shiftnav-retract {
   display: none;
   margin: 0;
 }
-.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift li.shiftnav-retract {
+.shiftnav ul.shiftnav-menu li.shiftnav-sub-shift > .sub-menu > li.shiftnav-retract {
   display: block;
 }
 /* Menu Items */
-.shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item {
-  /*margin-left:100%;*/
-  left: 100%;
-}
-.shiftnav.shiftnav-sub-shift-active ul.shiftnav-menu > li.menu-item.shiftnav-active {
-  /*margin-left:0;*/
-  left: 0;
-}
 /* Buttons Medium */
 .shiftnav ul.shiftnav-menu.shiftnav-targets-medium li.menu-item > .shiftnav-target {
   padding-top: 10px !important;
@@ -419,6 +454,16 @@ body.admin-bar .shiftnav {
 }
 .shiftnav ul.shiftnav-menu.shiftnav-targets-icon-enormous li.menu-item.shiftnav-has-icon > .shiftnav-target > i.shiftnav-icon:before {
   vertical-align: middle;
+}
+/* Submenu Indentation */
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu li.menu-item > a {
+  padding-left: 50px;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu ul.sub-menu li.menu-item > a {
+  padding-left: 75px;
+}
+.shiftnav ul.shiftnav-menu.shiftnav-indent-subs li.shiftnav-sub-always ul.sub-menu ul.sub-menu ul.sub-menu li.menu-item > a {
+  padding-left: 100px;
 }
 /* RESPONSIVENESS */
 @media only screen and (max-width: 960px) {
@@ -516,4 +561,11 @@ body.admin-bar .shiftnav {
 .shiftnav-loading .shiftnav-loading-message p {
   color: #fff;
   margin: 10px 0;
+}
+/* Hide on old IE */
+.ie8 .shiftnav,
+.ie8 .shiftnav-toggle,
+.ie7 .shiftnav,
+.ie7 .shiftnav-toggle {
+  display: none !important;
 }

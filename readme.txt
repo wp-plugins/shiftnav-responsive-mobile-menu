@@ -3,8 +3,8 @@ Contributors: sevenspark
 Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
 Requires at least: 3.8.1
-Tested up to: 3.9
-Stable tag: 1.0.1
+Tested up to: 4.0
+Stable tag: 1.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,20 @@ None. Yet.
 
 
 == Changelog ==
+
+= 1.2 =
+
+* Feature: Disable item setting
+* Feature: Hide UberMenu setting
+* Feature: UberMenu 3 Conditionals support
+* Feature: Setting to kill filters from bad themes
+* Feature: Set main toggle absolute or fixed
+* Feature: Optional close button when menu is open
+* Enhancement: Hide menu on IE7-8
+* Enhancement: Improve ShiftNav toggle compatibility with admin bar
+* Enhancement: Remove line height from shiftnav-wrap class
+* Enhancement: Remove scrollbar when content is short
+
 
 = 1.0.1 =
 
