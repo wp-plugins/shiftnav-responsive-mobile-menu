@@ -4,7 +4,7 @@ Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 1.3
+Stable tag: 1.3.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,10 @@ None. Yet.
 
 
 == Changelog ==
+
+= 1.3.0.1 =
+
+* 1.3 deployment was missing /assets directory
 
 = 1.3 =
 
