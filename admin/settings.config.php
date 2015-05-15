@@ -39,7 +39,7 @@ function shiftnav_get_settings_fields(){
 
 			array(
 				'name' => 'display_main',
-				'label' => __( 'Display Main ShiftNav', 'shiftnav' ),
+				'label' => __( 'Display Main ShiftNav Panel', 'shiftnav' ),
 				'desc' => __( 'Do not uncheck this unless you want to disable the main ShiftNav panel entirely.', 'shiftnav' ),
 				'type' => 'checkbox',
 				'default' => 'on'
@@ -49,6 +49,7 @@ function shiftnav_get_settings_fields(){
 				'name'		=> 'edge',
 				'label'		=> __( 'Edge' , 'shiftnav' ),
 				'type'		=> 'radio',
+				'desc'		=> __( 'Which edge of the viewport should the ShiftNav panel appear on?', 'ubermenu' ),
 				'options' 	=> array(
 					'left' 	=> 'Left',
 					'right'	=> 'Right',
@@ -73,6 +74,7 @@ function shiftnav_get_settings_fields(){
 				//'options' => get_registered_nav_menus()
 			),
 
+
 			array(
 				'name'		=> 'indent_submenus',
 				'label'		=> __( 'Indent Always Visible Submenus' , 'shiftnav' ),
@@ -84,7 +86,7 @@ function shiftnav_get_settings_fields(){
 			array(
 				'name' => 'display_site_title',
 				'label' => __( 'Display Site Title', 'shiftnav' ),
-				'desc' => __( 'Display the site title in the menu', 'shiftnav' ),
+				'desc' => __( 'Display the site title in the menu panel', 'shiftnav' ),
 				'type' => 'checkbox',
 				'default' => 'on'
 			),
@@ -115,7 +117,7 @@ function shiftnav_get_settings_fields(){
 			array(
 				'name' => 'display_toggle',
 				'label' => __( 'Display Toggle Bar', 'shiftnav' ),
-				'desc' => __( '', 'shiftnav' ),
+				'desc' => __( 'Uncheck this to disable the default toggle bar and add your own custom toggle', 'shiftnav' ),
 				'type' => 'checkbox',
 				'default' => 'on'
 			),
@@ -135,21 +137,31 @@ function shiftnav_get_settings_fields(){
 			),
 			array(
 				'name' => 'hide_ubermenu',
-				'label' => __( 'Hide UberMenu', 'shiftnav' ),
-				'desc' => __( 'Hide all UberMenus when ShiftNav is displayed.  If you would like to only hide a specific UberMenu, use the setting above with a specific UberMenu ID.', 'shiftnav' ) . ' ( <a href="http://wpmegamenu.com">What is UberMenu?</a> )',
+				'label' => __( 'Hide UberMenu 3', 'shiftnav' ),
+				'desc' => __( 'Hide all UberMenu 3 instances when ShiftNav is displayed.  If you would like to only hide a specific UberMenu, use the setting above with a specific UberMenu ID.', 'shiftnav' ) . ' ( <a href="http://wpmegamenu.com">What is UberMenu?</a> )',
 				'type' => 'checkbox',
 				'default' => 'off'
 			),
 			array(
 				'name'	=> 'toggle_content',
 				'label'	=> __( 'Toggle Content' , 'shiftnav' ),
-				'desc'	=> __( '[shift_toggle_title]' , 'shiftnav' ),
+				'desc'	=> __( 'The content to display in the main toggle bar.  Default: [shift_toggle_title]' , 'shiftnav' ),
 				'type'	=> 'textarea',
 				'default' => '[shift_toggle_title]', //get_bloginfo( 'title' )
 				'sanitize_callback' => 'shiftnav_allow_html',
 			),
 
-
+			array(
+				'name'	=> 'toggle_target',
+				'label'	=> __( 'Toggle Target' , 'shiftnav' ),
+				'desc'	=> __( 'The area which will trigger the ShiftNav Panel to open.' ),
+				'type'	=> 'radio',
+				'options'	=> array(
+					'burger_only'	=> __( 'Bars/Burger Icon Only' , 'shiftnav' ),
+					'entire_bar'	=> __( 'Entire Bar' , 'shiftnav' ),
+				),
+				'default'	=> 'burger_only',
+			),
 
 			array(
 				'name'	=> 'toggle_close_icon',
@@ -245,6 +257,22 @@ function shiftnav_get_settings_fields(){
 			'sanitize_callback' => 'shiftnav_allow_html',
 		),
 
+		array( 
+			'name'	=> 'footer_content',
+			'label'	=> __( 'Footer Content' , 'shiftnav' ),
+			'desc'	=> __( 'Add HTML or Shortcodes here and it will be injected at the wp_footer() hook.  Useful for fixed position elements' , 'shiftnav' ),
+			'type'	=> 'textarea',
+			'sanitize_callback' => 'shiftnav_allow_html',
+		),
+
+		array(
+			'name'	=> 'mobile_only',
+			'label'	=> __( 'Mobile Only' , 'shiftnav' ),
+			'desc'	=> __( 'Only display ShiftNav when a mobile device is detected via wp_is_mobile().  If you are using a caching plugin, make sure you have separate mobile and desktop caches.' , 'shiftnav' ),
+			'type'	=> 'checkbox',
+			'default'=> 'off',
+		),
+
 		array(
 			'name' => 'target_size',
 			'label' => __( 'Button Size', 'shiftnav' ),
@@ -296,6 +324,41 @@ function shiftnav_get_settings_fields(){
 			'type' 		=> 'checkbox',
 			'default' 	=> 'on'
 		),
+
+		array(
+			'name' 		=> 'shift_body_wrapper',
+			'label' 	=> __( 'Shift Body Wrapper', 'shiftnav' ),
+			'desc' 		=> __( 'Leave this blank to automatically create a ShiftNav Wrapper via javascript (this may have side effects).  Set a selector here to turn a specific div (which must wrap all body contents) into the wrapper.  Please note that if the wrapper you select is also styled by the theme, this may cause a conflict.', 'shiftnav' ),
+			'type' 		=> 'text',
+			'default' 	=> ''
+		),
+
+		array( 
+			'name'		=> 'disable_transforms',
+			'label'		=> __( 'Disable Transforms &amp; Transitions' , 'shiftnav' ),
+			'desc'		=> __( 'Disable CSS3 transformations and transitions.  This will disable smooth animations, but may work better on browsers that don\'t properly implement CSS3 transforms, especially old non-standard Android browsers.  Note that ShiftNav attempts to detect these browsers and fall back automatically, but some browsers have incomplete implementations of CSS3 transforms, which produce false positives when testing.' , 'shiftnav' ),
+			'type'		=> 'checkbox',
+			'default'	=> 'off',
+		),
+
+		array(
+			'name' 		=> 'touch_off_close',
+			'label' 	=> __( 'Touch-off close', 'shiftnav' ),
+			'desc' 		=> __( 'Close the ShiftNav panel when touching any content not in the panel.', 'shiftnav' ),
+			'type' 		=> 'checkbox',
+			'default' 	=> 'on'
+		),
+
+
+		array(
+			'name' 		=> 'scroll_offset',
+			'label' 	=> __( 'Scroll Offset', 'shiftnav' ),
+			'desc' 		=> __( 'When using the ScrollTo functionality, this is the number of pixels to offset the scroll by, to account for the toggle bar and any spacing you want.', 'shiftnav' ),
+			'type' 		=> 'text',
+			'default' 	=> 100,
+		),
+
+		
 
 		array(
 			'name' 		=> 'swipe_close',
@@ -564,12 +627,14 @@ function shiftnav_get_theme_location_ops(){
  * Display the plugin settings options page
  */
 function shiftnav_settings_panel() {
+
+	do_action( 'shiftnav_settings_panel' );
 	
 	$settings_api = _SHIFTNAV()->settings_api();
  
 	?>
 
-	<div class="wrap">
+	<div class="wrap shiftnav-wrap">
 	
 	<?php settings_errors(); ?>
 
@@ -607,6 +672,10 @@ function shiftnav_settings_panel() {
  * @return mixed
  */
 function shiftnav_op( $option, $section, $default = null ) {
+
+	if( $section == '__current_instance__' ){
+		$section = _SHIFTNAV()->get_current_instance();
+	}
  
 	$options = get_option( SHIFTNAV_PREFIX.$section );
 

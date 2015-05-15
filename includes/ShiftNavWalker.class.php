@@ -13,6 +13,7 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 	protected $menuItemOptions;
 	
 	protected $submenu_type;
+	protected $default_submenu_type = false;
 
 
 	/**
@@ -65,7 +66,7 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 	function end_lvl( &$output, $depth = 0, $args = array() ) {
 
 		//Make Content Customizable
-		$output.= '<li class="shiftnav-retract"><a class="shiftnav-target"><i class="fa fa-chevron-left"></i> Back</a></li>';
+		$output.= '<li class="shiftnav-retract"><a class="shiftnav-target"><i class="fa fa-chevron-left"></i> '.__( 'Back' , 'shiftnav' ).'</a></li>';
 		//$output.= '<li class="shiftnav-retract">BACK</li>';
 		
 		$indent = str_repeat("\t", $depth);
@@ -87,7 +88,8 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 	 */
 	function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
 		//$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
-		
+		//shiftp( $item );
+
 		$data = shiftnav_get_menu_item_data( $item->ID );
 		//shiftp( $data );
 	
@@ -102,7 +104,15 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		//Submenus
 		$has_sub = false;
 		if( in_array( 'menu-item-has-children' , $classes ) ) $has_sub = true;
-		$this->submenu_type = $submenu_type = isset( $data['submenu_type'] ) ? $data['submenu_type'] : 'always';
+		
+		$this->submenu_type = $submenu_type = isset( $data['submenu_type'] ) ? $data['submenu_type'] : 'default';
+		if( $submenu_type == 'default' ){
+			if( !$this->default_submenu_type ){
+				$this->default_submenu_type = shiftnav_op( 'submenu_type_default' , '__current_instance__' );
+			}
+			$this->submenu_type = $submenu_type = $this->default_submenu_type;
+		}
+
 		if( $has_sub ){
 			$classes[] = 'shiftnav-sub-'.$submenu_type;
 		}
@@ -142,6 +152,16 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		 * @param object $item    The current menu item.
 		 * @param array  $args    An array of arguments. @see wp_nav_menu()
 		 */
+		
+		if( isset( $data['disable_current'] ) && $data['disable_current'] == 'on' ){
+			$remove_current = array( 'current-menu-item' , 'current-menu-parent' , 'current-menu-ancestor' );
+			foreach( $classes as $k => $c ){
+				if( in_array( $c ,  $remove_current ) ){
+					unset( $classes[$k] );
+				}
+			}
+		}
+
 		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
 		$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
 
@@ -166,6 +186,12 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		$atts['target'] = ! empty( $item->target )     ? $item->target     : '';
 		$atts['rel']    = ! empty( $item->xfn )        ? $item->xfn        : '';
 		$atts['href']   = ! empty( $item->url )        ? $item->url        : '';
+
+
+		//Custom URL
+		if( isset( $data['custom_url'] ) && $data['custom_url'] ){
+			$atts['href'] = do_shortcode( $data['custom_url'] );
+		}
 
 		/**
 		 * Filter the HTML attributes applied to a menu item's <a>.
@@ -202,8 +228,12 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 
 		$item_output = $args->before;
 		$item_output .= '<'.$el.' class="shiftnav-target" '. $attributes .'>';
+		
 		/** This filter is documented in wp-includes/post-template.php */
 		$title = apply_filters( 'the_title', $item->title, $item->ID );
+
+		$title = do_shortcode( $title );
+		
 		if( $icon ) $title = '<span class="shiftnav-target-text">'.$title.'</span>';
 		$item_output .= $args->link_before . $icon . $title . $args->link_after;
 
@@ -282,6 +312,24 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		$id_field = $this->db_fields['id'];
 		$id = $element->$id_field;
 
+
+
+		//Ignore UberMenu Elements
+		if( $element->object == 'ubermenu-custom' ){
+			// if( empty( $children_elements[ $id ] ) ) return;
+			// foreach( $children_elements[ $id ] as $child ){
+			// 	$this->clear_children( $children_elements , $child->ID );
+			// }
+			// unset( $children_elements[ $id ] );
+
+			return;
+		}
+
+
+
+
+		
+
 		$data = shiftnav_get_menu_item_data( $id );
 
 		//If the item is disabled, kill its children, Lannister-style
@@ -295,15 +343,19 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 		if( shiftnav_op( 'inherit_ubermenu_conditionals' , 'general' ) == 'on' ){			
 
 			if( function_exists( 'ubermenu' ) ){
+
 				$has_children = ! empty( $children_elements[$element->$id_field] );
 				if ( isset( $args[0] ) && is_array( $args[0] ) ){			
 					$args[0]['has_children'] = $has_children;
 				}
 				$cb_args = array_merge( array(&$output, $element, $depth), $args);
 
-				$umitem_obect_class = apply_filters( 'ubermenu_item_object_class' , 'UberMenuItemDefault' , $element , $id , $this->auto_child );
-				$umitem = new $umitem_obect_class( $output , $element , $depth, $cb_args[3], $id , $this , $has_children );	//The $args that get passed to start_el are $cb[3] -- i.e. the 4the element in the array merged above
+				$umitem_object_class = apply_filters( 'ubermenu_item_object_class' , 'UberMenuItemDefault' , $element , $id , '' );
+				//$umitem = new $umitem_object_class( $output , $element , $depth, $cb_args[3], $id , $this , $has_children );	//The $args that get passed to start_el are $cb[3] -- i.e. the 4the element in the array merged above
+				$umitem = new dummy_um_item( $element->ID , $element );
 				$display_on = apply_filters( 'ubermenu_display_item' , true , $this , $element , $max_depth, $depth, $args , $umitem );
+
+
 			}
 			else{
 				$display_on = apply_filters( 'uberMenu_display_item' , true , $this , $element , $max_depth, $depth, $args );
@@ -352,3 +404,34 @@ class ShiftNavWalker extends Walker_Nav_Menu {
 	}
 
 } // Walker_Nav_Menu
+
+
+class dummy_um_item{
+	private $ID;
+	private $settings;
+	private $shiftnav_item;
+	private $url;
+
+	function __construct( $id , &$item ){
+		$this->ID = $id;
+		$this->shiftnav_item = $item;
+	}
+
+	function getSetting( $key ){
+		if( !isset( $this->settings ) ){
+			$this->settings = get_post_meta( $this->ID, UBERMENU_MENU_ITEM_META_KEY , true );
+		}
+		if( isset( $this->settings[$key] ) ){
+			return $this->settings[$key];
+		}
+		return false;
+	}
+
+	function set_url( $url ){
+		$this->url = $url;
+		$this->shiftnav_item->url = $url;
+	}
+	function get_url(){
+		return $this->shiftnav_item->url;
+	}
+}

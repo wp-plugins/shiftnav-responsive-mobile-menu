@@ -40,15 +40,19 @@ class ShiftNav_Settings_API {
 	/**
 	 * Enqueue scripts and styles
 	 */
-	function admin_enqueue_scripts() {
-		wp_enqueue_style( 'wp-color-picker' );
-		wp_enqueue_script('wp-color-picker');
-		wp_enqueue_script( 'jquery' );
-		//wp_enqueue_script( 'media-upload' );
-		//wp_enqueue_script( 'thickbox' );
+	function admin_enqueue_scripts( $hook ) {
+		if( $hook == 'appearance_page_shiftnav-settings' ){
+			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_script('wp-color-picker');
+			wp_enqueue_script( 'jquery' );
+			//wp_enqueue_script( 'media-upload' );
+			//wp_enqueue_script( 'thickbox' );
 
-		wp_enqueue_media();
+			wp_enqueue_media();
+		}
 	}
+
+
 
 	/**
 	 * Set settings sections

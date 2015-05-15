@@ -2,6 +2,8 @@
 
 function shiftnav( $id , $settings = array() ){
 
+	_SHIFTNAV()->set_current_instance( $id );
+
 	$ops = shiftnav_get_instance_options( $id );
 
 	extract( wp_parse_args( $settings , array(
@@ -35,34 +37,36 @@ function shiftnav( $id , $settings = array() ){
 		if( !$disable_menu ){
 
 			$args = array(
-				'container_class' 	=> 'shiftnav-nav', //$container_class,	//shiftnav-transition-standard 
+				//'container_class' 	=> 'shiftnav-nav', //$container_class,	//shiftnav-transition-standard 
 				//'container_id'		=> $id,
 				'container'			=> $container,
-				'menu_class' 		=> 'shiftnav-menu',
-				'walker'			=> new ShiftNavWalker,
-				'fallback_cb'		=> 'shiftnav_fallback',
-				'depth'				=> 0,
+				// 'menu_class' 		=> 'shiftnav-menu',
+				// 'walker'			=> new ShiftNavWalker,
+				// 'fallback_cb'		=> 'shiftnav_fallback',
+				// 'depth'				=> 0,
 				'shiftnav'			=> $id,
 			);
 
+			$args = shiftnav_get_menu_args( $args , $id );
 
-			//Target size
-			$args['menu_class'].= ' shiftnav-targets-'.shiftnav_op( 'target_size' , 'general' );
 
-			//Text size
-			$args['menu_class'].= ' shiftnav-targets-text-'.shiftnav_op( 'text_size' , 'general' );
+			// //Target size
+			// $args['menu_class'].= ' shiftnav-targets-'.shiftnav_op( 'target_size' , 'general' );
 
-			//Icon size
-			$args['menu_class'].= ' shiftnav-targets-icon-'.shiftnav_op( 'icon_size' , 'general' );
+			// //Text size
+			// $args['menu_class'].= ' shiftnav-targets-text-'.shiftnav_op( 'text_size' , 'general' );
 
-			//Submenu indent
-			if( shiftnav_op( 'indent_submenus' , $id ) == 'on' ) $args['menu_class'].= ' shiftnav-indent-subs';
+			// //Icon size
+			// $args['menu_class'].= ' shiftnav-targets-icon-'.shiftnav_op( 'icon_size' , 'general' );
 
-			//Active on hover
-			if( shiftnav_op( 'active_on_hover' , 'general' ) == 'on' ) $args['menu_class'].= ' shiftnav-active-on-hover';
+			// //Submenu indent
+			// if( shiftnav_op( 'indent_submenus' , $id ) == 'on' ) $args['menu_class'].= ' shiftnav-indent-subs';
 
-			//Active Highlight
-			if( shiftnav_op( 'active_highlight' , 'general' ) == 'on' ) $args['menu_class'].= '	shiftnav-active-highlight';
+			// //Active on hover
+			// if( shiftnav_op( 'active_on_hover' , 'general' ) == 'on' ) $args['menu_class'].= ' shiftnav-active-on-hover';
+
+			// //Active Highlight
+			// if( shiftnav_op( 'active_highlight' , 'general' ) == 'on' ) $args['menu_class'].= '	shiftnav-active-highlight';
 			
 
 			if( $menu != '_none' ){

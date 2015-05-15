@@ -2,9 +2,9 @@
 Contributors: sevenspark
 Donate link: http://shiftnav.io/pro
 Tags: responsive, menu, navigation, mobile, off-canvas, app, slide, sidebar
-Requires at least: 3.8.1
-Tested up to: 4.0
-Stable tag: 1.2
+Requires at least: 4.0
+Tested up to: 4.2
+Stable tag: 1.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,33 @@ None. Yet.
 
 
 == Changelog ==
+
+= 1.3 =
+
+* Feature: Fixed Toggle Buttons
+* Feature: Default Toggle Styles
+* Feature: ShiftNav Wrapper setting to define pre-existing shift wrapper
+* Feature: Icon toggled class
+* Feature: Ignore UberMenu Advanced items in ShiftNav, but still display child items
+* Feature: Display ShiftNav only on mobile devices
+* Feature: Allow shortcodes in Navigation Labels
+* Feature: Ability to disable transforms
+* Feature: Automatically auto play videos after shiftnav-wrap is added
+* Feature: Fire shiftnav-loaded event
+* Feature: Scroll To Offset setting
+* Feature: Setting to make toggle entire bar vs just button
+* Feature: Touch-off close as configurable setting
+* Enhancement: Layer ShiftNav over admin bar
+* Enhancement: Multiple breakpoint pixel widths rather than percentages
+* Enhancement: Better UberMenu Conditionals compatibility
+* Enhancement: Load ShiftNav after UberMenu
+* Enhancement: When the main toggle bar is disabled, don't push down the WP Admin bar
+* Enhancement: Padding tweaks
+* Enhancement: Whitelist Android browsers rather than blacklist
+* Enhancement: Avoid unintended opening with erroneous touchEnd events
+* Enhancement: Make sure centered toggled bar content doesn\'t overlap toggle icon
+* Enhancement: Prevent swipe-open above breakpoint
+
 
 = 1.2 =
 
@@ -97,6 +124,10 @@ None. Yet.
 Initial Beta Release
 
 == Upgrade Notice ==
+
+= 1.3 =
+
+Version 1.3 includes new features and enhancements
 
 = 1.0 =
 

@@ -300,6 +300,14 @@ function shiftnav_menu_item_settings(){
 		'desc'		=> __( 'The selector for an item to scroll to when clicked, if present.  Example: <code>#section-1</code>', 'shiftnav' )
 	);
 
+	$settings['general'][42] = array(
+		'id' 		=> 'disable_current',
+		'title'		=> __( 'Disable Current' , 'shiftnav' ),
+		'type'		=> 'checkbox',
+		'default' 	=> 'off',
+		'desc'		=> __( 'Disable the current menu item classes for this item', 'shiftnav' )
+	);
+
 	$settings['general'][80] = array(
 		'id' 		=> 'disable_item',
 		'title'		=> __( 'Disable Item', 'shiftnav' ),
@@ -322,10 +330,11 @@ function shiftnav_menu_item_settings(){
 		'id' 		=> 'submenu_type',
 		'title'		=> __( 'Submenu Type', 'shiftnav' ),
 		'type'		=> 'select',
-		'default'	=> 'always',
-		'desc'		=> '',
+		'default'	=> 'default',
+		'desc'		=> __( '[Requires Pro Version] Overrides the default submenu type.  For the Lite version, only "Always visible" is available.  Can be changed to "Accordion" or "Shift" with the Pro version.' , 'shiftnav' ),
 		'ops'		=> array(
-						'always'	=>	__( 'Always showing', 'shiftnav' ),
+						'default'	=>  __( 'Menu Default (Always Visible for Lite)', 'shiftnav' ),
+						'always'	=>	__( 'Always visible', 'shiftnav' ),
 					),
 	);
 

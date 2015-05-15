@@ -1,5 +1,12 @@
 <?php
+add_action( 'plugins_loaded' , 'shiftnav_load_textdomain' );
+function shiftnav_load_textdomain(){
+	load_plugin_textdomain( 'shiftnav' , false , SHIFTNAV_BASEDIR.'/languages' );
+}
+
 function shiftnav_inject_css(){
+
+	if( !_SHIFTNAV()->display_now() ) return;
 
 	$css = '';
 
@@ -22,7 +29,7 @@ function shiftnav_inject_css(){
 	$toggle_breakpoint = shiftnav_op( 'breakpoint' , 'togglebar' );
 	if( $toggle_breakpoint != '' ){
 		$css.= "\t@media only screen and (min-width:{$toggle_breakpoint}px){ ";
-		$css.= "#shiftnav-toggle-main{ display:none; } .shiftnav-wrap { padding-top:0 !important; } ";
+		$css.= "#shiftnav-toggle-main, .shiftnav-toggle-mobile{ display:none; } .shiftnav-wrap { padding-top:0 !important; } ";
 		if( shiftnav_op( 'shift_body' , 'general' ) == 'off' ) $css.= "body.shiftnav-disable-shift-body{ padding-top:0 !important; } ";
 		$css.= "}\n";
 
@@ -78,17 +85,42 @@ add_action( 'wp_head' , 'shiftnav_inject_css' );
 
 function shiftnav_direct_injection(){
 
+	if( !_SHIFTNAV()->display_now() ) return;
+
 	if( shiftnav_op( 'display_toggle' , 'togglebar' ) == 'on' ){
 
 		?>
 	<!-- ShiftNav Main Toggle -->
 		<?php
 
-		shiftnav_toggle( 'shiftnav-main' , shiftnav_main_toggle_content() , array(
+		$disable_toggle = false; //true;
+		$toggle_class = 'shiftnav-toggle-main-align-'.shiftnav_op( 'align' , 'togglebar' );
+
+		if( shiftnav_op( 'toggle_target' , 'togglebar' ) == 'entire_bar' ){
+			$toggle_class.= ' shiftnav-toggle-main-entire-bar';
+		}
+		else{
+			$disable_toggle = true;
+			add_action( 'shiftnav_toggle_before_content' , 'shiftnav_main_toggle_burger' , 10 , 3 );
+		}
+		
+
+
+		/* 	<div id="shiftnav-toggle-main" class="<?php echo $main_toggle_class; ?>">
+		 		<?php shiftnav_toggle( 'shiftnav-main' ); ?>
+		 		<?php shiftnav_main_toggle_content(); ?>
+		 	</div> */
+
+		$main_toggle_target = apply_filters( 'shiftnav_main_toggle_target' , 'shiftnav-main' );
+
+		shiftnav_toggle( $main_toggle_target , shiftnav_main_toggle_content() , array(
 			'id' => 'shiftnav-toggle-main' , 
 			'el' => 'div',
-			'class' => 'shiftnav-toggle-main-align-'.shiftnav_op( 'align' , 'togglebar' ),
+			'class' => $toggle_class,
+			'disable_toggle' => $disable_toggle,
 		));
+
+		remove_action( 'shiftnav_toggle_before_content' , 'shiftnav_main_toggle_burger' , 10 , 3 );
 
 		?>
 
@@ -100,6 +132,10 @@ function shiftnav_direct_injection(){
 			'theme_location' 	=> 'shiftnav' , 
 			'edge'				=> shiftnav_op( 'edge' , 'shiftnav-main' ),
 			));
+	}
+
+	if( $footer_content = shiftnav_op( 'footer_content' , 'general' ) ){
+		echo do_shortcode( $footer_content );
 	}
 
 	if( current_user_can( 'manage_options') ): 
@@ -123,6 +159,20 @@ function shiftnav_direct_injection(){
 }
 add_action( 'wp_footer', 'shiftnav_direct_injection' );
 
+
+function shiftnav_main_toggle_burger( $main_toggle , $target_id , $id ){
+	if( $main_toggle ){
+		$main_toggle_target = apply_filters( 'shiftnav_main_toggle_target' , 'shiftnav-main' );
+		shiftnav_toggle( $main_toggle_target , '<i class="fa fa-bars"></i>' , array(
+			'id' => 'shiftnav-toggle-main-button' , 
+			'el' => 'span',
+			'class' => 'shiftnav-toggle-burger',
+			'actions' => false, //if we ran the actions, we'd enter into a weird fifth dimension and collapse the universe
+		));
+		//echo '<span class="shiftnav-toggle-burger"><i class="fa fa-bars"></i></span>';
+	}
+}
+
 function shiftnav_main_toggle_content(){
 	//echo '[_'.shiftnav_op( 'toggle_content' , 'togglebar' ).'_]';
 	return '<span class="shiftnav-main-toggle-content shiftnav-toggle-main-block">' . do_shortcode( shiftnav_op( 'toggle_content' , 'togglebar' ) ) . '</span>';
@@ -137,6 +187,9 @@ function _shiftnav_toggle( $target_id , $content = '', $args = array() ){
 		'id'	=>	'',
 		'el'	=>	'a',
 		'class'	=> 	'',
+		'disable_toggle' => false,
+		'actions' => true,
+		'icon'	=> '',
 	) ) );
 
 	$content = do_shortcode( $content );
@@ -145,7 +198,7 @@ function _shiftnav_toggle( $target_id , $content = '', $args = array() ){
 	if( $id && $id == 'shiftnav-toggle-main' ) $main_toggle = true;
 
 	if( $main_toggle ){
-		$class = 'shiftnav-toggle-edge-'.shiftnav_op( 'edge' , 'shiftnav-main' );
+		$class.= ' shiftnav-toggle-edge-'.shiftnav_op( 'edge' , 'shiftnav-main' );
 		$class.= ' shiftnav-toggle-icon-'.shiftnav_op( 'toggle_close_icon' , 'togglebar' );
 
 		if( shiftnav_op( 'toggle_position' , 'togglebar' ) == 'absolute' ){
@@ -155,12 +208,15 @@ function _shiftnav_toggle( $target_id , $content = '', $args = array() ){
 		$class.= ' ' . $class;
 	}
 
+	if( !$disable_toggle ) $class = 'shiftnav-toggle shiftnav-toggle-'.$target_id.' '.$class;
+
 	echo "<$el ";
 		if( $id ): ?>id="<?php echo $id; ?>"<?php endif; 
-		?> class="shiftnav-toggle shiftnav-toggle-<?php echo $target_id; ?> <?php echo $class; ?>" data-shiftnav-target="<?php echo $target_id; ?>"><?php 
-		do_action( 'shiftnav_toggle_before_content' , $main_toggle , $target_id , $id );
+		?> class="<?php echo $class; ?>" data-shiftnav-target="<?php echo $target_id; ?>"><?php 
+		if( $actions ) do_action( 'shiftnav_toggle_before_content' , $main_toggle , $target_id , $id );
+		if( $icon ) echo '<i class="fa fa-'.$icon.'"></i> ';
 		echo apply_filters( 'shiftnav_toggle_content' , $content , $target_id , $id );
-		do_action( 'shiftnav_toggle_after_content' , $main_toggle , $target_id , $id );
+		if( $actions ) do_action( 'shiftnav_toggle_after_content' , $main_toggle , $target_id , $id );
 	echo "</$el>"; ?>
 	<?php
 }
@@ -172,13 +228,14 @@ function shiftnav_toggle_shortcode( $atts, $content ){
 	extract( shortcode_atts( array(
 		'target' 	=> 'shiftnav-main',
 		'toggle_id' => '',
-		'el'		=> 'a'
+		'el'		=> 'a',
+		'class'		=> '',
+		'icon'		=> '',
 	), $atts, 'shiftnav_toggle' ) );
-
 
 	ob_start();
 
-	shiftnav_toggle( $target , $content , array( 'id' => $toggle_id , 'el' => $el ) );
+	shiftnav_toggle( $target , $content , array( 'id' => $toggle_id , 'el' => $el , 'class' => $class , 'icon' => $icon ) );
 
 	$toggle = ob_get_contents();
 
@@ -200,8 +257,15 @@ add_action( 'init', 'shiftnav_register_theme_locations' );
 
 function shiftnav_load_assets(){
 
+	if( !_SHIFTNAV()->display_now() ) return;
+
 	$assets = SHIFTNAV_URL . 'assets/';
-	wp_enqueue_style( 'shiftnav' , $assets.'css/shiftnav.css' , false , SHIFTNAV_VERSION );
+	if( SCRIPT_DEBUG ){
+		wp_enqueue_style( 'shiftnav' , $assets.'css/shiftnav.css' , false , SHIFTNAV_VERSION );
+	}
+	else{
+		wp_enqueue_style( 'shiftnav' , $assets.'css/shiftnav.min.css' , false , SHIFTNAV_VERSION );
+	}
 
 	if( shiftnav_op( 'load_fontawesome' , 'general' ) == 'on' ){
 		wp_enqueue_style( 'shiftnav-font-awesome' , $assets.'css/fontawesome/css/font-awesome.min.css' , false , SHIFTNAV_VERSION );
@@ -217,10 +281,16 @@ function shiftnav_load_assets(){
 	
 
 	wp_enqueue_script( 'jquery' );
-	wp_enqueue_script( 'shiftnav' , $assets.'js/shiftnav.js' , array( 'jquery' ) , SHIFTNAV_VERSION , true );
+	if( SCRIPT_DEBUG ){
+		wp_enqueue_script( 'shiftnav' , $assets.'js/shiftnav.js' , array( 'jquery' ) , SHIFTNAV_VERSION , true );
+	}
+	else{
+		wp_enqueue_script( 'shiftnav' , $assets.'js/shiftnav.min.js' , array( 'jquery' ) , SHIFTNAV_VERSION , true );
+	}
 
 	wp_localize_script( 'shiftnav' , 'shiftnav_data' , array( 
 		'shift_body'			=>	shiftnav_op( 'shift_body' , 'general' ),
+		'shift_body_wrapper'	=>	shiftnav_op( 'shift_body_wrapper' , 'general' ),
 		'lock_body'				=>	shiftnav_op( 'lock_body' , 'general' ),
 		'lock_body_x'			=>	shiftnav_op( 'lock_body_x' , 'general' ),
 		'swipe_close'			=>	shiftnav_op( 'swipe_close' , 'general' ),
@@ -231,9 +301,15 @@ function shiftnav_load_assets(){
 		'open_current'			=>	shiftnav_op( 'open_current' , 'general' ),
 		'collapse_accordions'	=> 	shiftnav_op( 'collapse_accordions' , 'general' ),
 		'scroll_panel'			=>	shiftnav_op( 'scroll_panel' , 'general' ),
+		'breakpoint'			=> 	shiftnav_op( 'breakpoint' , 'togglebar' ),
+
+		'touch_off_close'		=>	shiftnav_op( 'touch_off_close' , 'general' ),
+		'scroll_offset'			=>	shiftnav_op( 'scroll_offset' , 'general' ),
+		'disable_transforms'	=>	shiftnav_op( 'disable_transforms' , 'general' ),
+
 	) );
 }
-add_action( 'wp_enqueue_scripts' , 'shiftnav_load_assets' , 21 );
+add_action( 'wp_enqueue_scripts' , 'shiftnav_load_assets' , 101 );
 
 
 function shiftnav_get_skin_ops(){
@@ -305,7 +381,7 @@ add_action( 'shiftnav_before' , 'shiftnav_main_site_title' , 10 );
 add_action( 'wp_head' , 'shiftnav_prevent_interference' );
 function shiftnav_prevent_interference(){
 	if( shiftnav_op( 'force_filter' , 'general' ) == 'on' ){
-		add_filter( 'wp_nav_menu_args' , 'shiftnav_force_filter' );
+		add_filter( 'wp_nav_menu_args' , 'shiftnav_force_filter' , 1000 );
 	}
 	if( shiftnav_op( 'kill_class_filter' , 'general' ) == 'on' ){
 		remove_all_filters( 'nav_menu_css_class' );
@@ -316,18 +392,53 @@ function shiftnav_prevent_interference(){
 function shiftnav_force_filter( $args ){
 
 	if( isset( $args['shiftnav'] ) ){
-		$args['container_class'] 	= 'shiftnav-nav';
-		$args['container']			= 'nav';
-		$args['menu_class']			= 'shiftnav-menu';
-		$args['walker']				= new ShiftNavWalker;
-		$args['fallback_cb']		= 'shiftnav_fallback';
-		$args['depth']				= 0;
+		$args = shiftnav_get_menu_args( $args );
+		// $args['container_class'] 	= 'shiftnav-nav';
+		// $args['container']			= 'nav';
+		// $args['menu_class']			= 'shiftnav-menu';
+		// $args['walker']				= new ShiftNavWalker;
+		// $args['fallback_cb']		= 'shiftnav_fallback';
+		// $args['depth']				= 0;
 	}
 
 	return $args;
 }
 
 
+function shiftnav_get_menu_args( $args , $id = 0 ){
+
+	$args['container_class'] 	= 'shiftnav-nav';
+	$args['container']			= 'nav';
+	$args['menu_class']			= 'shiftnav-menu';
+	$args['walker']				= new ShiftNavWalker;
+	$args['fallback_cb']		= 'shiftnav_fallback';
+	$args['depth']				= 0;
+
+	if( $id === 0 ) $id = isset( $args['shiftnav'] ) ? $args['shiftnav'] : 'shiftnav-main';
+
+
+	//Target size
+	$args['menu_class'].= ' shiftnav-targets-'.shiftnav_op( 'target_size' , 'general' );
+
+	//Text size
+	$args['menu_class'].= ' shiftnav-targets-text-'.shiftnav_op( 'text_size' , 'general' );
+
+	//Icon size
+	$args['menu_class'].= ' shiftnav-targets-icon-'.shiftnav_op( 'icon_size' , 'general' );
+
+	//Submenu indent
+	if( shiftnav_op( 'indent_submenus' , $id ) == 'on' ) $args['menu_class'].= ' shiftnav-indent-subs';
+
+	//Active on hover
+	if( shiftnav_op( 'active_on_hover' , 'general' ) == 'on' ) $args['menu_class'].= ' shiftnav-active-on-hover';
+
+	//Active Highlight
+	if( shiftnav_op( 'active_highlight' , 'general' ) == 'on' ) $args['menu_class'].= '	shiftnav-active-highlight';
+	
+
+	return $args;
+
+}
 
 
 

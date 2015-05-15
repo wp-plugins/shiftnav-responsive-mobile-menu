@@ -21,3 +21,49 @@ function shiftnav_pro_link(){
 	<?php
 }
 if( !SHIFTNAV_PRO ) add_action( 'shiftnav_settings_before' , 'shiftnav_pro_link' );
+
+
+
+//ADMIN NOTICE SYSTEM
+if( is_admin() ){
+	add_action( 'admin_notices' , 'shiftnav_display_admin_notices' );
+}
+function shiftnav_display_admin_notices(){
+	if( $messages = get_option( 'shiftnav_admin_notices' ) ){
+		$change = false;
+		if( is_array( $messages ) ){
+			foreach( $messages as $k => $m ){
+				?>
+				<div class="<?php echo $m['type']; ?>">
+					<p><?php echo $m['text']; ?></p>
+				</div>
+				<?php
+				if( $m['repeat'] > 0 ){
+					$m['repeat']--;
+					if( $m['repeat'] == 0 ){
+						unset( $messages[$k] );
+					}
+					$change = true;
+				}
+
+				if( $change ){
+					update_option( 'shiftnav_admin_notices' , $messages );
+				}
+			}
+		}
+	}
+}
+
+function shiftnav_set_admin_notice( $text , $type = 'updated' , $repeat = 1, $dismissable = false , $expiration = -1 ){
+	$messages = get_option( 'shiftnav_admin_notices' , array() );
+	if( is_array( $messages ) ){
+		$messages[] = array(
+			'text'			=> $text,
+			'type'			=> $type,
+			'repeat'		=> $repeat,
+			'dismissable'	=> $dismissable,
+			'expiration'	=> $expiration,		//TODO
+		);
+		update_option( 'shiftnav_admin_notices' , $messages );
+	}
+}

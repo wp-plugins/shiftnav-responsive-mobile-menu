@@ -6,13 +6,15 @@ Description: An off-canvas mobile menu for WordPress
 Author: Chris Mavricos, SevenSpark
 Author URI: http://sevenspark.com
 License: GPLv2
-Version: 1.2
+Version: 1.3
 */
 
-/* Copyright 2014 Chris Mavricos, SevenSpark */
+/* Copyright 2014-2015 Chris Mavricos, SevenSpark */
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
+
+//define( 'SHIFTNAV_EXTENDED' , true );
 
 if ( !class_exists( 'ShiftNav' ) ) :
 
@@ -24,12 +26,19 @@ final class ShiftNav {
 	private static $skins;
 	private static $settings_defaults;
 	private static $registered_icons;
+	private static $current_instance = 'shiftnav-main';
+	private static $is_mobile = null;
+	private static $display_now = null;
+
+	private static $support_url;
 
 	public static function instance() {
+
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new ShiftNav;
 			self::$instance->setup_constants();
 			self::$instance->includes();
+			self::$instance->activation_check();
 		}
 		return self::$instance;
 	}
@@ -46,13 +55,17 @@ final class ShiftNav {
 		// Plugin version
 
 		if( ! defined( 'SHIFTNAV_VERSION' ) )
-			define( 'SHIFTNAV_VERSION', '1.2' );
+			define( 'SHIFTNAV_VERSION', '1.3' );
 
 		if( ! defined( 'SHIFTNAV_PRO' ) )
 			define( 'SHIFTNAV_PRO', false );
 
 		if( ! defined( 'SHIFTNAV_BASENAME' ) )
 			define( 'SHIFTNAV_BASENAME' , plugin_basename( __FILE__ ) );
+
+		if( ! defined( 'SHIFTNAV_BASEDIR' ) ){
+			define( 'SHIFTNAV_BASEDIR' , dirname( plugin_basename(__FILE__) ) );
+		}
 
 		// Plugin Folder URL
 		if( ! defined( 'SHIFTNAV_URL' ) )
@@ -72,6 +85,10 @@ final class ShiftNav {
 		if( ! defined( 'SHIFTNAV_EXTENDED' ) )
 			define( 'SHIFTNAV_EXTENDED', false );
 
+		//URLS
+		define( 'SHIFTNAV_SUPPORT_URL' , 'http://sevenspark.com/help' );
+		
+
 		define( 'SHIFTNAV_PREFIX' , 'shiftnav_' );
 	}
 
@@ -89,12 +106,32 @@ final class ShiftNav {
 
 	}
 
+	private function activation_check(){
+
+		if( SHIFTNAV_PRO ){
+			$last_activated = get_option( 'shiftnav_pro_version' , '0' );
+			if( !version_compare( $last_activated , SHIFTNAV_VERSION , '=' ) ){
+				do_action( 'shiftnav_update' );
+				update_option( 'shiftnav_pro_version' , SHIFTNAV_VERSION );
+			}
+		}
+	}
+
 	public function settings_api(){
 		if( self::$settings_api == null ){
 			self::$settings_api = new ShiftNav_Settings_API();
 		}
 		return self::$settings_api;
 	}
+
+	public function get_current_instance(){
+		return self::$current_instance;
+	}
+
+	public function set_current_instance( $instance_id ){
+		return self::$current_instance = $instance_id;
+	}
+
 
 	public function get_skins(){
 		return self::$skins;
@@ -108,7 +145,7 @@ final class ShiftNav {
 			'src'	=> $src,
 		);
 
-		wp_register_style( 'shiftnav-'.$id , $src );
+		wp_register_style( 'shiftnav-'.$id , $src , false , SHIFTNAV_VERSION );
 	}
 
 	public function set_defaults( $fields ){
@@ -160,6 +197,88 @@ final class ShiftNav {
 	}
 	function get_registered_icons(){ //$group = '' ){
 		return self::$registered_icons;
+	}
+
+
+	static function is_mobile(){
+		if( self::$is_mobile === null ){
+			self::$is_mobile = apply_filters( 'shiftnav_is_mobile' , wp_is_mobile() );
+		}
+		return self::$is_mobile;
+	}
+	function display_now(){
+
+		if( self::$display_now === null ){
+
+			$display = true;
+
+			//Mobile only and this isn't mobile
+			if( shiftnav_op( 'mobile_only' , 'general' ) == 'on' && !self::is_mobile() ){
+				$display = false;
+			}
+
+			self::$display_now = apply_filters( 'shiftnav_display_now' , $display );
+		}
+
+		return self::$display_now;	
+
+	}
+
+	function get_support_url(){
+
+		if( self::$support_url ){
+			return self::$support_url;
+		}
+
+		$url = SHIFTNAV_SUPPORT_URL;
+
+		$data = array();
+
+
+		$data['src']			= 'shiftnav_pro_plugin';
+		$data['product_id']		= 6;
+
+		//Site Data
+		$data['site_url'] 		= get_site_url();
+		$data['version']		= SHIFTNAV_VERSION;
+		$data['timezone']		= get_option('timezone_string');
+
+		//Theme Data
+		$theme = wp_get_theme();
+		//uberp( $theme , 3 );
+		$data['theme']			= $theme->get( 'Name' );
+		$data['theme_link']		= '<a target="_blank" href="'.$theme->get( 'ThemeURI' ).'">'. $theme->get( 'Name' ). ' v'.$theme->get( 'Version' ).' by ' . $theme->get( 'Author' ).'</a>';
+		$data['theme_slug']		= isset( $theme->stylesheet ) ? $theme->stylesheet : '';
+		$data['theme_parent']	= $theme->get( 'Template' );
+
+		//User Data
+		$current_user = wp_get_current_user();
+		if( $current_user ){
+			if( $current_user->user_firstname ){
+				$data['first_name']		= $current_user->user_firstname;
+			}
+			if( $current_user->user_firstname ){
+				$data['last_name']		= $current_user->user_lastname;
+			}
+			if( $current_user ){
+				$data['email']			= $current_user->user_email;
+			}
+		}
+		//$data['email']			= get_bloginfo( 'admin_email' );
+
+
+		//License Data
+		$license_code = shiftnav_op( 'license_code' , 'updates' , '' );
+		if( $license_code ){
+			$data['license_code']	= $license_code;
+		}
+
+		$query = http_build_query( $data );
+
+		$support_url = "$url?$query";
+		self::$support_url = $support_url;
+
+		return $support_url;
 	}
 
 }

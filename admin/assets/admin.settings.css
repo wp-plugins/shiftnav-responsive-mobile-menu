@@ -200,3 +200,146 @@ h4.shiftnav-settings-section{
 .shiftnav_pro_button i{
 	margin-right:3px;
 }
+
+
+.shiftnav-wrap form h3{
+	display:none;
+	background:#444;
+	color:#eee;
+	border-left: 3px solid #3AAD75;
+}
+#wpbody-content .shiftnav-wrap .metabox-holder{
+	padding-top:0;
+	border-top:6px solid #444;
+}
+.shiftnav-wrap .nav-tab-active{
+	background:#444;
+	color:#eee;
+	border:none;
+	border-top: 3px solid #3AAD75;
+
+}
+
+
+.shiftnav-wrap .form-table tr:nth-child(2n){
+	background:#f9f9f9;
+	border-bottom:1px solid #eee;
+	border-top:1px solid #eee;
+}
+.shiftnav-wrap .form-table td,
+.shiftnav-wrap .form-table th{
+	padding-top:30px;
+	padding-bottom:30px;
+}
+
+
+
+.shiftnav-wrap label,
+.shiftnav-wrap .description{
+	font-size: 13px;
+	font-style: italic;
+	color:#999;
+}
+.shiftnav-wrap .radio + label{
+	font-size:14px;
+	font-style:normal;
+	color:#222;
+}
+.shiftnav-wrap .description .shiftnav-license-invalid{
+	background:#900;
+	padding:5px 10px;
+	color:#eee;
+}
+.shiftnav-wrap .description .shiftnav-license-error{
+	border:2px solid #900;
+	padding:3px 8px;
+}
+
+
+
+
+
+.shiftnav-settings-notice{
+	padding:10px 20px 10px 40px;
+	border:1px solid #eee;
+	border-left:none;
+	float:left;
+	position:relative;
+	box-shadow:0 0 5px rgba(0,0,0,.1);
+	clear:both;
+	margin-bottom:10px;
+}
+.shiftnav-settings-notice:before{
+	content:'';
+	position:absolute;
+	border-left:3px solid #333;
+	top:0;
+	left:0;
+	height:100%;
+}
+.shiftnav-settings-notice > strong{
+	color:#333;
+	font-size:14px;
+	line-height:1.6em;
+}
+.shiftnav-settings-notice a[download]{
+	margin-left:5px;
+	color:#777;
+	background:#eee;
+	padding:2px 6px;
+	border:1px solid #ddd;
+}
+.shiftnav-settings-notice a[download]:hover{
+	color:#49A5FF;
+	background:#e9e9e9;
+}
+.shiftnav-settings-notice p{
+	color:#555;
+	font-size:12px;
+}
+.shiftnav-settings-notice .shiftnav-settings-notice-icon {
+	position:absolute;
+	top:14px;
+	left:18px;
+}
+
+.shiftnav-settings-success strong,
+.shiftnav-settings-success .shiftnav-settings-notice-icon {
+	color:#1BA61B;
+}
+.shiftnav-settings-success:before{
+	border-left-color:#1BA61B;
+}
+
+
+
+.shiftnav-settings-error{
+	
+}
+.shiftnav-settings-error:before{
+	border-left-color:#DA3333;
+}
+.shiftnav-settings-error strong,
+.shiftnav-settings-error .shiftnav-settings-notice-icon {
+	color:#DA3333;
+}
+
+
+
+.shiftnav-settings-notice-large{
+	padding-left:70px;
+}
+.shiftnav-settings-notice-large > strong{
+	font-size:16px;
+	line-height:1.7em;
+}
+.shiftnav-settings-notice-large .shiftnav-settings-notice-icon {
+	font-size:24px;
+	left:24px;
+}
+
+
+
+.shiftnav-sub-desc-manualint{
+	color: #13C3F7;
+}

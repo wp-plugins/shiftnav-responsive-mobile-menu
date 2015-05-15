@@ -20,7 +20,9 @@
 			swipe_tolerance_y: 30,			//max vertical displacement
 			swipe_edge_proximity: 70,		//maximum distance from edge
 			open_current: false,
-			collapse_accordions: false
+			collapse_accordions: false,
+			scroll_offset:100,
+			disable_transforms: false
 		};
 
 	function Plugin ( element, options ) {
@@ -53,6 +55,7 @@
 		}
 
 		this.toggleevent = this.touchEnd == 'touchend' ? this.touchEnd + ' click' : this.touchEnd;	//add click except for IE		
+		//this.toggleevent = 'click';
 		this.transitionend = 'transitionend.shiftnav webkitTransitionEnd.shiftnav msTransitionEnd.shiftnav oTransitionEnd.shiftnav';
 
 		//TESTING
@@ -102,11 +105,21 @@
 				if( shiftnav_data.lock_body == 'on' ) $body.addClass( 'shiftnav-lock' );
 				if( shiftnav_data.lock_body_x == 'on' ) $body.addClass( 'shiftnav-lock-x' );
 				
-				if( shiftnav_data.shift_body != 'off' ) $body.wrapInner( '<div class="shiftnav-wrap"></div>' );	//unique
+				if( shiftnav_data.shift_body != 'off' ){
+					if( shiftnav_data.shift_body_wrapper != '' ){
+						$( shiftnav_data.shift_body_wrapper ).addClass( 'shiftnav-wrap' );
+					}
+					else{
+						$body.wrapInner( '<div class="shiftnav-wrap"></div>' );	//unique
+						$( 'video[autoplay]' ).each( function(){
+							$(this).get(0).play();
+						});
+					}
+				}
 				else $body.addClass( 'shiftnav-disable-shift-body' );
 
 				//Move elements outside of shifter
-				$( '#shiftnav-toggle-main, #wpadminbar' ).appendTo( 'body' );
+				$( '#shiftnav-toggle-main, #wpadminbar, .shiftnav-fixed-left, .shiftnav-fixed-right' ).appendTo( 'body' );
 
 				var $wrap = $( '.shiftnav-wrap' );
 
@@ -117,20 +130,29 @@
 
 				//Setup non-transform
 				//Some browsers provide false positives for feature detection, so we have to do browser detection as well, sadly
-				var fpos = false;	//falsePositive
+				var fpos = false;	//falsePositive	- 
 				var ua = navigator.userAgent.toLowerCase();
 
+				//Many mobile Android browsers are dumb
 				if( /android/.test( ua ) ){
+					fpos = true; //we're going to whitelist mobile Android browsers, so assume false positive on Android
+
 					//always ignore old androids
 					if( /android [1-3]/.test( ua ) ) fpos = true;
-					//always allow Chrome
+					//Chrome on 4+ is good
 					else if( /chrome/.test( ua ) ) fpos = false;
+					//Firefox on 4+ is good
+					else if( /firefox/.test( ua ) ) fpos = false;
+					
+					//always allow Chrome
+					//else if( /chrome/.test( ua ) ) fpos = false;
 					//Android 4.4+ is okay
-					else if( /android 4.[4-9]/.test( ua ) ) fpos = false;
-					else fpos = true;
+					//else if( /android 4.[4-9]/.test( ua ) ) fpos = false;
+					//else fpos = true;
 				}
 
-				if( !shift_supports( 'transform' ) || fpos ){
+
+				if( !shift_supports( 'transform' ) || fpos || plugin.settings.disable_transforms ){
 					$body.addClass( 'shiftnav-no-transforms' );
 				}
 
@@ -147,6 +169,7 @@
 					if( shiftnav_data.shift_body == 'off' ) $wrap = $( 'body' );
 
 					$wrap.on( 'touchstart' , function( e ){
+						if( plugin.settings.breakpoint && $( window ).width() > plugin.settings.breakpoint ) return;
 						wrap_start_y = e.originalEvent.changedTouches[0].pageY;
 						wrap_start_x = e.originalEvent.changedTouches[0].pageX;
 						//console.log( "START: " + wrap_start_x );
@@ -166,7 +189,7 @@
 								if( wrap_cur_x - wrap_start_x > plugin.settings.swipe_tolerance_x ){
 									wrap_cur_y = e.originalEvent.changedTouches[0].pageY;
 									if( Math.abs( wrap_cur_y - wrap_start_y ) < plugin.settings.swipe_tolerance_y ){
-										plugin.openShiftNav();
+										plugin.openShiftNav( 'swipe right' );
 										e.stopPropagation();
 									}
 								}
@@ -186,7 +209,7 @@
 								if( ( wrap_start_x - wrap_cur_x > plugin.settings.swipe_tolerance_x ) ){
 									wrap_cur_y = e.originalEvent.changedTouches[0].pageY;
 									if( Math.abs( wrap_cur_y - wrap_start_y ) < plugin.settings.swipe_tolerance_y ){
-										plugin.openShiftNav();
+										plugin.openShiftNav( 'swipe left' );
 										e.stopPropagation();
 									}
 								}
@@ -263,7 +286,7 @@
 
 			//Current open
 			if( plugin.settings.open_current ){
-				$( '.shiftnav .shiftnav-sub-accordion.current-menu-item, .shiftnav .shiftnav-sub-accordion.current-menu-item-ancestor' ).addClass( 'shiftnav-active' );
+				$( '.shiftnav .shiftnav-sub-accordion.current-menu-item, .shiftnav .shiftnav-sub-accordion.current-menu-ancestor' ).addClass( 'shiftnav-active' );
 			}
 			
 		},
@@ -272,13 +295,23 @@
 
 			var plugin = this;
 
+			this.$shiftnav.find( '.shiftnav-scrollto' )
+				.removeClass( 'current-menu-item' )
+				.removeClass( 'current-menu-ancestor');
+
 			this.$shiftnav.on( 'click' , '.shiftnav-target' , function( e ){
 				var scrolltarget = $(this).data( 'shiftnav-scrolltarget' );
 				if( scrolltarget ){
 					var $target = $( scrolltarget ).first();
 					if( $target.size() > 0 ){
+						//Make current
+						var $li = $(this).parent('.menu-item');
+						$li.siblings().removeClass( 'current-menu-item' ).removeClass( 'current-menu-ancestor' );
+						$li.addClass( 'current-menu-item' );
+						var top = $target.offset().top;
+						top = top - plugin.settings.scroll_offset;
 						$( 'html,body' ).animate({
-							scrollTop: $target.offset().top
+							scrollTop: top
 						}, 1000 , 'swing' ,
 						function(){
 							plugin.closeShiftNav();	//close the menu after a successful scroll
@@ -348,44 +381,47 @@
 			
 			var plugin = this;
 
-			//this.$toggles.on( 'click', 'a', function(e){
-			this.$toggles.on( this.toggleevent, 'a', function(e){
+			
+			this.$toggles.on( 'click' , 'a', function(e){	//this.toggleevent,
 				//allow link to be clicked but don't propagate so toggle won't activate
 				e.stopPropagation();
 			});
 
-			//this.$toggles.on( 'click', function(e){
-			this.$toggles.on( this.toggleevent, function(e){
-
-				e.preventDefault();
-				e.stopPropagation();
-				
-				//Ignore click events when toggle is disabled to avoid both touch and click events firing
-				if( e.originalEvent.type == 'click' && $(this).data( 'disableToggle' ) ){
-					return;
-				}
-
-				if( plugin.$shiftnav.hasClass( 'shiftnav-open-target' ) ){
-					//console.log( 'close shift nav' );
-					plugin.closeShiftNav();
-				}
-				else{
-					//console.log('open shift nav');
-					plugin.openShiftNav();
-				}
-
-				//Temporarily disable toggle for click event when touch is fired
-				if( e.originalEvent.type != 'click' ){
-					$( this ).data( 'disableToggle' , true );
-					setTimeout( function(){
-						$( this ).data( 'disableToggle' , false );
-					}, 1000 );
-				}
-
-				return false;
-								
+			//Toggle on click
+			this.$toggles.on( 'click' , function(e){
+				plugin.toggle( $(this) , plugin , e );
 			});
 
+		},
+
+		toggle: function( $toggle , plugin , e ){
+			e.preventDefault();
+			e.stopPropagation();
+			
+			//Ignore click events when toggle is disabled to avoid both touch and click events firing
+			if( e.originalEvent.type == 'click' && $(this).data( 'disableToggle' ) ){
+				return;
+			}
+
+			if( plugin.$shiftnav.hasClass( 'shiftnav-open-target' ) ){
+				//console.log( 'close shift nav' );
+				plugin.closeShiftNav();
+			}
+			else{
+				//console.log('open shift nav');
+				var tag = $(this).attr( 'id' ) == 'shiftnav-toggle-main' ? '[Main Toggle Bar]' : '"'+$(this).text()+'"';
+				plugin.openShiftNav( 'toggle: ' + tag );
+			}
+
+			//Temporarily disable toggle for click event when touch is fired
+			if( e.originalEvent.type != 'click' ){
+				$( this ).data( 'disableToggle' , true );
+				setTimeout( function(){
+					$( this ).data( 'disableToggle' , false );
+				}, 1000 );
+			}
+
+			return false;
 		},
 
 		initializeSwipeHandler: function(){
@@ -395,6 +431,8 @@
 				start_x = 0,
 				cur_y = 0,
 				cur_x = 0,
+				diff_y = 0,
+				diff_x = 0,
 				plugin = this,
 				scrollprevented = false,
 				viewport_height = $(window).height(),
@@ -430,7 +468,7 @@
 				else if( e.currentTarget.scrollHeight === e.currentTarget.scrollTop + e.currentTarget.offsetHeight ){
 					cur_y = e.originalEvent.changedTouches[0].pageY;
 					if( cur_y < start_y ){
-						//console.log( 'TOP | scrolling up' );
+						//console.log( 'BOTTOM | scrolling down' );
 						scrollprevented = true;
 						e.preventDefault();
 					}
@@ -443,6 +481,7 @@
 					diff_x = Math.abs( start_x - e.originalEvent.changedTouches[0].pageX );
 					if( diff_y < diff_x ){
 						e.preventDefault();
+						//console.log( 'scroll prevented ! ' + diff_y + ' ' + diff_x );
 					}
 				}
 			});
@@ -482,9 +521,13 @@
 
 		},
 
-		openShiftNav: function(){
+		openShiftNav: function( tag ){
+
+			tag = tag || '?';
 
 			var plugin = this;
+
+			if( this.settings.debug ) console.log( 'openShiftNav ' + tag );
 
 			$( 'body' )
 				.removeClass( 'shiftnav-open-right shiftnav-open-left' )
@@ -669,6 +712,9 @@
 						_$li.removeClass( 'shiftnav-in-transition' );
 						_$ul.off( plugin.transitionend  + '_closesubmenu' );
 					});
+
+					//Close all children
+					plugin.closeSubmenu( _$li.find( '.shiftnav-active' ) , tag+'_recursive' , plugin );
 				});
 			}
 			
@@ -745,24 +791,43 @@ jQuery( document ).ready( function($){
 	//Remove Loading Message
 	$( '.shiftnav-loading' ).remove();
 
-	//Scroll to non-ID "hashes"
-	if( window.location.hash.substring(1,2) == '.' ){
-		var $scrollTarget = $( window.location.hash.substring(1) );
-		if( $scrollTarget.size() ) window.scrollTo( 0 , $scrollTarget.offset().top );
-	}
-
 	//Run ShiftNav
 	jQuery( '.shiftnav' ).shiftnav({
 		swipe_tolerance_x : parseInt( shiftnav_data.swipe_tolerance_x ),
 		swipe_tolerance_y : parseInt( shiftnav_data.swipe_tolerance_y ),
 		swipe_edge_proximity : parseInt( shiftnav_data.swipe_edge_proximity ),
 		open_current : shiftnav_data.open_current == 'on' ? true : false,
-		collapse_accordions : shiftnav_data.collapse_accordions == 'on' ? true : false
+		collapse_accordions : shiftnav_data.collapse_accordions == 'on' ? true : false,
+		breakpoint : parseInt( shiftnav_data.breakpoint ),
+		touchOffClose: shiftnav_data.touch_off_close == 'on' ? true : false,
+		scroll_offset:  shiftnav_data.scroll_offset,
+		disable_transforms: shiftnav_data.disable_transforms == 'on' ? true : false
 		//debug: true
 		//mouseEvents: false
 		//clicktest: true
 	});
 
+	//Scroll to non-ID "hashes"
+	if( window.location.hash.substring(1,2) == '.' ){
+		var $scrollTarget = $( window.location.hash.substring(1) );		
+		var top = $scrollTarget.offset().top - shiftnav_data.scroll_offset;
+		if( $scrollTarget.size() ) window.scrollTo( 0 , top );
+	}
+
+	if(  window.location.hash ){
+		//Highlight item
+		var hash = window.location.hash;
+		if( hash.substring(1,2) == '.' ) hash = hash.substring(1);
+		//console.log( '.shiftnav .shiftnav-target[data-shiftnav-scrolltarget='+hash+']' );
+		var $li = $( '.shiftnav .shiftnav-target[data-shiftnav-scrolltarget='+hash+']' ).parent();
+		if( $li.size() ){
+			//console.log( $li );
+			$li.siblings().removeClass( 'current-menu-item' ).removeClass( 'current-menu-ancestor' );
+			$li.addClass( 'current-menu-item' );
+		}
+	}
+
+	$( '.shiftnav' ).trigger( 'shiftnav-loaded' );
 });
 
 
